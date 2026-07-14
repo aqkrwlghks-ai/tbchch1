@@ -19,6 +19,7 @@
 </section>
 
 <div class="page-body">
+  <div class="photo-grid" id="photo-grid-page"></div>
   <ul class="gallery-list" id="gallery-list-page"></ul>
 </div>
 
@@ -26,11 +27,22 @@
 <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
 <script src="/common.js"></script>
 <script>
-function driveEmbedHtml(driveUrl) {
-  const m = driveUrl.match(/\/folders\/([a-zA-Z0-9_-]+)/);
-  if (!m) return '';
-  return `<div class="drive-embed-wrap"><iframe src="https://drive.google.com/embeddedfolderview?id=${m[1]}#grid" loading="lazy"></iframe></div>`;
-}
+fetch('/.netlify/functions/drive-photos')
+  .then(res => res.json())
+  .then(data => {
+    const grid = document.getElementById('photo-grid-page');
+    if (data.error || !data.photos || data.photos.length === 0) {
+      grid.innerHTML = '<p class="photo-grid-empty">아직 사진이 없거나 불러오지 못했습니다.</p>';
+      return;
+    }
+    grid.innerHTML = data.photos.map(p =>
+      `<a href="${p.link}" target="_blank" rel="noopener" title="${p.name}"><img src="${p.thumb}" alt="${p.name}" loading="lazy"></a>`
+    ).join('');
+  })
+  .catch(() => {
+    document.getElementById('photo-grid-page').innerHTML = '<p class="photo-grid-empty">아직 사진이 없거나 불러오지 못했습니다.</p>';
+  });
+
 document.addEventListener('sitedata:loaded', (e) => {
   const data = e.detail;
   const list = document.getElementById('gallery-list-page');
@@ -38,7 +50,7 @@ document.addEventListener('sitedata:loaded', (e) => {
   if (data.gallery && data.gallery.length > 0) {
     data.gallery.forEach(item => {
       const li = document.createElement('li');
-      li.innerHTML = `<a href="${item.drive_url}" target="_blank" rel="noopener">📁 ${item.title}</a>` + driveEmbedHtml(item.drive_url);
+      li.innerHTML = `<a href="${item.drive_url}" target="_blank" rel="noopener">📁 ${item.title} 전체보기</a>`;
       list.appendChild(li);
     });
   } else {

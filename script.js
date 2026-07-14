@@ -1,11 +1,23 @@
 // applyBindings()는 common.js에 정의되어 있다 (헤더/푸터 포함 전체 페이지 공통)
 
-// 구글드라이브 폴더 링크에서 미리보기 임베드 HTML을 만든다 (공개 폴더만 보임)
-function driveEmbedHtml(driveUrl) {
-  const m = driveUrl.match(/\/folders\/([a-zA-Z0-9_-]+)/);
-  if (!m) return '';
-  const folderId = m[1];
-  return `<div class="drive-embed-wrap"><iframe src="https://drive.google.com/embeddedfolderview?id=${folderId}#grid" loading="lazy"></iframe></div>`;
+// 구글드라이브 최근 사진을 최신순 그리드로 불러온다 (Netlify Function 경유)
+function loadPhotoGrid(containerId) {
+  const grid = document.getElementById(containerId);
+  if (!grid) return;
+  fetch('/.netlify/functions/drive-photos')
+    .then(res => res.json())
+    .then(data => {
+      if (data.error || !data.photos || data.photos.length === 0) {
+        grid.innerHTML = '<p class="photo-grid-empty">아직 사진이 없거나 불러오지 못했습니다.</p>';
+        return;
+      }
+      grid.innerHTML = data.photos.map(p =>
+        `<a href="${p.link}" target="_blank" rel="noopener" title="${p.name}"><img src="${p.thumb}" alt="${p.name}" loading="lazy"></a>`
+      ).join('');
+    })
+    .catch(() => {
+      grid.innerHTML = '<p class="photo-grid-empty">아직 사진이 없거나 불러오지 못했습니다.</p>';
+    });
 }
 
 function renderParagraphs(container, text) {
@@ -47,13 +59,16 @@ fetch('/content/site.json')
     iframe.src = `https://www.youtube.com/embed/videoseries?list=${data.sermon.youtube_playlist_id}`;
     document.getElementById('sermon-channel-link').href = data.sermon.youtube_channel_url;
 
-    // 갤러리 (구글드라이브 링크)
+    // 갤러리 최근 사진 (최신순 그리드)
+    loadPhotoGrid('photo-grid');
+
+    // 갤러리 (구글드라이브 폴더 링크 — 전체보기용)
     const galleryList = document.getElementById('gallery-list');
     galleryList.innerHTML = '';
     if (data.gallery && data.gallery.length > 0) {
       data.gallery.forEach(item => {
         const li = document.createElement('li');
-        li.innerHTML = `<a href="${item.drive_url}" target="_blank" rel="noopener">📁 ${item.title}</a>` + driveEmbedHtml(item.drive_url);
+        li.innerHTML = `<a href="${item.drive_url}" target="_blank" rel="noopener">📁 ${item.title} 전체보기</a>`;
         galleryList.appendChild(li);
       });
     } else {
