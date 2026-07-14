@@ -1,0 +1,72 @@
+backend:
+  name: git-gateway
+  branch: main
+
+media_folder: "admin/uploads"
+public_folder: "/admin/uploads"
+
+locale: "ko"
+
+collections:
+  - name: "site"
+    label: "사이트 기본 설정"
+    files:
+      - name: "site"
+        label: "전체 내용 편집"
+        file: "content/site.json"
+        fields:
+          - { label: "메인화면", name: "hero", widget: object, fields:
+              - { label: "작은 제목", name: "pretitle", widget: string }
+              - { label: "강조 단어 (노란색)", name: "pretitle_accent", widget: string }
+              - { label: "표어 첫줄", name: "verse_line1", widget: string }
+              - { label: "표어 둘째줄", name: "verse_line2", widget: string }
+              - { label: "성경구절 출처", name: "reference", widget: string }
+            }
+          - { label: "교회소개", name: "about", widget: object, fields:
+              - { label: "정식 교단/교회명", name: "lead", widget: string }
+              - { label: "인사말 본문", name: "message", widget: text, hint: "문단을 나누려면 빈 줄을 한 줄 띄워주세요" }
+              - { label: "강조 문구", name: "highlight", widget: string }
+              - { label: "서명", name: "signature", widget: string }
+            }
+          - { label: "예배안내", name: "worship", widget: list, fields:
+              - { label: "예배 이름", name: "name", widget: string }
+              - { label: "시간", name: "time", widget: string }
+            }
+          - { label: "설교 영상", name: "sermon", widget: object, fields:
+              - { label: "유튜브 채널 주소", name: "youtube_channel_url", widget: string }
+              - { label: "유튜브 업로드 재생목록 ID (채널ID UC를 UU로 바꾸면 됩니다)", name: "youtube_playlist_id", widget: string }
+            }
+          - { label: "헌금안내", name: "offering", widget: object, fields:
+              - { label: "계좌 정보", name: "bank_info", widget: string }
+              - { label: "예금주", name: "holder", widget: string }
+              - { label: "안내 문구", name: "note", widget: string }
+            }
+          - { label: "매일 묵상 말씀 (팝업에 매일 하나씩 자동으로 바뀌어 표시됩니다)", name: "daily_verses", widget: list, hint: "성경 문구는 정확한 번역본(개역개정 권장)을 그대로 옮겨 적어주세요", fields:
+              - { label: "말씀 본문", name: "text", widget: text }
+              - { label: "출처 (예: 요한복음 3장 16절)", name: "reference", widget: string }
+            }
+          - { label: "갤러리 (구글드라이브 링크)", name: "gallery", widget: list, required: false, fields:
+              - { label: "제목", name: "title", widget: string }
+              - { label: "구글드라이브 링크", name: "drive_url", widget: string }
+            }
+          - { label: "교회 기본정보", name: "contact", widget: object, fields:
+              - { label: "교회 정식 명칭", name: "church_name", widget: string }
+              - { label: "담임목사 성함", name: "pastor", widget: string }
+              - { label: "전화번호", name: "phone", widget: string }
+              - { label: "팩스번호", name: "fax", widget: string }
+              - { label: "이메일", name: "email", widget: string }
+              - { label: "주소", name: "address", widget: string }
+              - { label: "버스 안내", name: "bus", widget: string }
+            }
+
+  - name: "notices"
+    label: "공지사항"
+    files:
+      - name: "notices"
+        label: "공지사항 목록"
+        file: "content/notices.json"
+        fields:
+          - { label: "공지 목록", name: "notices", widget: list, fields:
+              - { label: "날짜", name: "date", widget: datetime, format: "YYYY-MM-DD", date_format: "YYYY-MM-DD", time_format: false }
+              - { label: "제목", name: "title", widget: string }
+            }
