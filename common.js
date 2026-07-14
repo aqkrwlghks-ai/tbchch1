@@ -61,6 +61,14 @@ function loadSiteData(callback) {
       document.dispatchEvent(new CustomEvent('noticesdata:loaded', { detail: data.notices }));
     })
     .catch(err => console.error('notices.json 로드 실패:', err));
+
+  fetch('/content/bulletins.json')
+    .then(res => res.json())
+    .then(data => {
+      window.__bulletinsData = data.bulletins;
+      document.dispatchEvent(new CustomEvent('bulletinsdata:loaded', { detail: data.bulletins }));
+    })
+    .catch(err => console.error('bulletins.json 로드 실패:', err));
 }
 
 function injectPartials(callback) {

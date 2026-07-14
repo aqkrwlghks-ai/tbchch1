@@ -19,10 +19,7 @@
 </section>
 
 <div class="page-body">
-  <div class="page-placeholder">
-    <div class="icon">🛠️</div>
-    <p>이 페이지는 준비 중입니다. 곧 내용을 채워드리겠습니다.</p>
-  </div>
+  <ul class="notice-list" id="bulletin-list-page"></ul>
 </div>
 
 <div id="footerHost"></div>
@@ -30,6 +27,20 @@
 <script src="/supabase-config.js"></script>
 <script src="/member-auth.js"></script>
 <script src="/common.js"></script>
-
+<script>
+document.addEventListener('bulletinsdata:loaded', (e) => {
+  const list = document.getElementById('bulletin-list-page');
+  if (!e.detail || e.detail.length === 0) {
+    list.innerHTML = '<li class="gallery-empty">아직 등록된 주보가 없습니다.</li>';
+    return;
+  }
+  list.innerHTML = '';
+  e.detail.slice().sort((a,b) => (a.date < b.date ? 1 : -1)).forEach(b => {
+    const li = document.createElement('li');
+    li.innerHTML = `<span class="notice-date">${b.date}</span><span class="notice-title"><a href="${b.file}" target="_blank" rel="noopener" style="color:inherit;">📄 ${b.title}</a></span>`;
+    list.appendChild(li);
+  });
+});
+</script>
 </body>
 </html>

@@ -517,7 +517,7 @@ section { padding: 88px 0; }
 .notice { background: #fff; }
 .notice-list { list-style: none; }
 .notice-list li { display: flex; gap: 16px; padding: 16px 0; border-bottom: 1px solid var(--border-light); }
-.notice-date { color: var(--green); font-weight: 700; font-size: 13px; min-width: 80px; }
+.notice-date { color: var(--green); font-weight: 700; font-size: 13px; min-width: 80px; margin-right: 14px; }
 .notice-title { color: var(--text-dark); }
 
 /* Offering */

@@ -163,7 +163,9 @@ fetch('/content/notices.json')
       .sort((a, b) => (a.date < b.date ? 1 : -1))
       .forEach(n => {
         const li = document.createElement('li');
-        li.innerHTML = `<span class="notice-date">${n.date}</span><span class="notice-title">${n.title}</span>`;
+        li.style.display = 'block';
+        const body = n.body ? `<p style="margin-top:8px;color:var(--text-gray);font-size:14px;">${n.body.replace(/\n/g, '<br>')}</p>` : '';
+        li.innerHTML = `<div><span class="notice-date">${n.date}</span><span class="notice-title">${n.title}</span></div>${body}`;
         list.appendChild(li);
       });
   })
