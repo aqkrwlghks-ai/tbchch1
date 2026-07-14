@@ -5,10 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>빛나는교회</title>
 <meta name="description" content="기독교대한성결교회 빛나는교회 — 성령의 능력 안에서 복음과 섬김으로 하나님의 영광을 드러내는 교회">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 fill=%22%230b0b0c%22/><text x=%2250%22 y=%2268%22 font-size=%2260%22 text-anchor=%22middle%22 fill=%22%23ffd400%22>✦</text></svg>">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%230f3b64%22/><text x=%2250%22 y=%2268%22 font-size=%2255%22 text-anchor=%22middle%22 fill=%22white%22>✦</text></svg>">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -17,7 +15,8 @@
   <div class="verse-modal-backdrop" id="verseModalBackdrop"></div>
   <div class="verse-modal-box">
     <button class="verse-modal-close" id="verseModalClose" aria-label="닫기">✕</button>
-    <p class="verse-modal-label">오늘의 <span class="accent">묵상</span></p>
+    <p class="verse-modal-label">TODAY'S MEDITATION</p>
+    <p class="verse-modal-title">오늘의 묵상</p>
     <p class="verse-modal-text" id="verseModalText"></p>
     <p class="verse-modal-ref" id="verseModalRef"></p>
     <label class="verse-modal-hide">
@@ -28,7 +27,7 @@
 
 <header class="site-header" id="top">
   <div class="header-inner">
-    <a href="#top" class="logo">빛나는교회</a>
+    <a href="#top" class="logo"><span class="logo-mark">✦</span>빛나는교회</a>
     <nav class="nav" id="nav">
       <a href="#about">교회소개</a>
       <a href="#worship">예배안내</a>
@@ -36,8 +35,8 @@
       <a href="#gallery">갤러리</a>
       <a href="#notice">공지사항</a>
       <a href="#visit">오시는길</a>
-      <a href="#offering">헌금안내</a>
     </nav>
+    <a href="#offering" class="btn btn-primary btn-sm">온라인헌금</a>
     <button class="nav-toggle" id="navToggle" aria-label="메뉴 열기">
       <span></span><span></span><span></span>
     </button>
@@ -45,60 +44,78 @@
 </header>
 
 <section class="hero">
-  <div class="hero-grid"></div>
   <div class="hero-inner">
-    <p class="hero-pretitle" data-bind="hero.pretitle">하나님의 말씀을 <span class="accent" data-bind="hero.pretitle_accent">곱씹다</span></p>
+    <p class="hero-eyebrow" data-bind="hero.pretitle">하나님의 말씀을 <span class="accent" data-bind="hero.pretitle_accent">곱씹다</span></p>
     <h1 class="hero-title">빛나는교회</h1>
-    <p class="hero-verse"><span data-bind="hero.verse_line1"></span><br><span data-bind="hero.verse_line2"></span></p>
+    <p class="hero-verse"><span data-bind="hero.verse_line1"></span> <span data-bind="hero.verse_line2"></span></p>
     <p class="hero-ref" data-bind="hero.reference"></p>
     <div class="hero-cta">
-      <a href="#sermon" class="btn btn-accent">설교 영상 보기</a>
-      <a href="#visit" class="btn btn-outline">오시는길</a>
+      <a href="#sermon" class="btn btn-primary">설교 영상 보기</a>
+      <a href="#visit" class="btn btn-ghost">오시는길</a>
     </div>
   </div>
 </section>
 
 <section class="quicklinks">
-  <div class="container">
+  <div class="container quicklinks-grid">
     <a href="#worship" class="qcard">
-      <span class="qcard-icon">🕊</span>
-      <h3>예배시간</h3>
-      <p id="qcard-worship">주일 1부 오전 9:10 · 2부 오전 11:00</p>
+      <span class="qcard-icon qi-blue">🕊</span>
+      <div>
+        <h3>예배시간</h3>
+        <p id="qcard-worship">주일 1부 오전 9:10 · 2부 오전 11:00</p>
+      </div>
     </a>
     <a href="#visit" class="qcard">
-      <span class="qcard-icon">📍</span>
-      <h3>오시는길</h3>
-      <p data-bind="contact.address"></p>
+      <span class="qcard-icon qi-green">📍</span>
+      <div>
+        <h3>오시는길</h3>
+        <p data-bind="contact.address"></p>
+      </div>
     </a>
     <a href="#offering" class="qcard">
-      <span class="qcard-icon">🙏</span>
-      <h3>온라인헌금</h3>
-      <p>계좌번호 안내 보기</p>
+      <span class="qcard-icon qi-coral">🙏</span>
+      <div>
+        <h3>온라인헌금</h3>
+        <p>계좌번호 안내 보기</p>
+      </div>
     </a>
   </div>
 </section>
 
 <section class="about" id="about">
-  <div class="container narrow">
-    <h2 class="section-title"><span class="accent">교회</span>소개</h2>
-    <p class="about-lead" data-bind="about.lead"></p>
-    <div class="about-message" id="about-message"></div>
-    <p class="about-highlight" data-bind="about.highlight"></p>
-    <p class="about-signature" data-bind="about.signature"></p>
+  <div class="container">
+    <p class="eyebrow">WELCOME GREETING</p>
+    <h2 class="section-title">빛나는교회에 오신 것을 환영합니다</h2>
+    <div class="about-grid">
+      <div class="about-message" id="about-message"></div>
+      <div class="about-side">
+        <p class="about-highlight" data-bind="about.highlight"></p>
+        <p class="about-lead" data-bind="about.lead"></p>
+        <p class="about-signature" data-bind="about.signature"></p>
+      </div>
+    </div>
   </div>
 </section>
 
 <section class="worship" id="worship">
   <div class="container">
-    <h2 class="section-title"><span class="accent">예배</span>안내</h2>
-    <div class="worship-grid" id="worship-grid"></div>
+    <p class="eyebrow">FAITH LIFE TIMETABLE</p>
+    <h2 class="section-title">빛나는교회 정규 예배 시간표</h2>
+    <div class="worship-table-wrap">
+      <table class="worship-table">
+        <thead>
+          <tr><th>예배명</th><th>시간</th></tr>
+        </thead>
+        <tbody id="worship-tbody"></tbody>
+      </table>
+    </div>
   </div>
 </section>
 
 <section class="sermon" id="sermon">
-  <div class="sermon-grid"></div>
   <div class="container">
-    <h2 class="section-title light"><span class="accent">설교</span> 영상</h2>
+    <p class="eyebrow">WEEKLY WORSHIP MEDIA</p>
+    <h2 class="section-title">설교 영상</h2>
     <p class="sermon-desc">새 영상이 올라오면 자동으로 반영됩니다.</p>
     <div class="video-wrap">
       <iframe id="sermon-iframe"
@@ -111,14 +128,15 @@
       </iframe>
     </div>
     <div class="sermon-cta">
-      <a id="sermon-channel-link" href="#" target="_blank" rel="noopener" class="btn btn-accent">유튜브 채널에서 더보기</a>
+      <a id="sermon-channel-link" href="#" target="_blank" rel="noopener" class="btn btn-primary">유튜브 채널에서 더보기</a>
     </div>
   </div>
 </section>
 
 <section class="gallery" id="gallery">
   <div class="container narrow">
-    <h2 class="section-title"><span class="accent">갤러리</span>·자료실</h2>
+    <p class="eyebrow">ACTIVE BEAUTIFUL MOMENTS</p>
+    <h2 class="section-title">빛나는교회 갤러리·자료실</h2>
     <p class="gallery-desc">사진·자료는 구글드라이브 링크로 연결됩니다.</p>
     <ul class="gallery-list" id="gallery-list"></ul>
   </div>
@@ -126,14 +144,16 @@
 
 <section class="notice" id="notice">
   <div class="container narrow">
-    <h2 class="section-title"><span class="accent">공지</span>사항</h2>
+    <p class="eyebrow">ACTIVE CHURCH BOARDS</p>
+    <h2 class="section-title">빛나는교회 소식</h2>
     <ul class="notice-list" id="notice-list"></ul>
   </div>
 </section>
 
 <section class="offering" id="offering">
   <div class="container narrow">
-    <h2 class="section-title"><span class="accent">헌금</span>안내</h2>
+    <p class="eyebrow">ONLINE OFFERING</p>
+    <h2 class="section-title">헌금안내</h2>
     <div class="offering-box">
       <p class="offering-bank" data-bind="offering.bank_info"></p>
       <p class="offering-holder">예금주 : <span data-bind="offering.holder"></span></p>
@@ -144,7 +164,8 @@
 
 <section class="visit" id="visit">
   <div class="container narrow">
-    <h2 class="section-title"><span class="accent">오시는</span>길</h2>
+    <p class="eyebrow">FIND US</p>
+    <h2 class="section-title">오시는길</h2>
     <div class="visit-info">
       <p><strong>주소</strong> <span data-bind="contact.address"></span></p>
       <p><strong>전화</strong> <span data-bind="contact.phone"></span></p>
@@ -155,12 +176,25 @@
 </section>
 
 <footer class="site-footer">
-  <div class="container">
-    <p class="footer-name" data-bind="contact.church_name"></p>
-    <p class="footer-line">담임목사 <span data-bind="contact.pastor"></span> &nbsp;·&nbsp; T. <span data-bind="contact.phone"></span> &nbsp;·&nbsp; F. <span data-bind="contact.fax"></span></p>
-    <p class="footer-line"><span data-bind="contact.address"></span> &nbsp;·&nbsp; <span data-bind="contact.email"></span></p>
-    <p class="footer-copy">COPYRIGHT © 빛나는교회. ALL RIGHTS RESERVED.</p>
+  <div class="container footer-grid">
+    <div>
+      <p class="footer-logo"><span class="logo-mark">✦</span>빛나는교회</p>
+      <p class="footer-desc" data-bind="hero.verse_line1"></p>
+    </div>
+    <div>
+      <p class="footer-heading">교회 연락처 안내</p>
+      <p class="footer-line" data-bind="contact.church_name"></p>
+      <p class="footer-line">담임목사 <span data-bind="contact.pastor"></span></p>
+      <p class="footer-line">T. <span data-bind="contact.phone"></span> · F. <span data-bind="contact.fax"></span></p>
+      <p class="footer-line" data-bind="contact.email"></p>
+    </div>
+    <div>
+      <p class="footer-heading">오시는 길</p>
+      <p class="footer-line" data-bind="contact.address"></p>
+      <p class="footer-line" data-bind="contact.bus"></p>
+    </div>
   </div>
+  <p class="footer-copy">COPYRIGHT © 빛나는교회. ALL RIGHTS RESERVED.</p>
 </footer>
 
 <script src="script.js"></script>

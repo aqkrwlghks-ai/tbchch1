@@ -31,7 +31,9 @@
     "holder": "빛나는교회",
     "note": "헌금 관련 문의는 아래 연락처로 부탁드립니다."
   },
-  "gallery": [],
+  "gallery": [
+    { "title": "교회 사진·자료 폴더", "drive_url": "https://drive.google.com/drive/u/2/folders/1tbcejmqyzPM94zowqFwv12ZYml3LMRkU" }
+  ],
   "daily_verses": [
     { "text": "보라 형제가 연합하여 동거함이 어찌 그리 선하고 아름다운지요", "reference": "시편 133편 1절" }
   ],

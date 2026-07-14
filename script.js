@@ -34,14 +34,13 @@ fetch('content/site.json')
     // 인사말 본문 (문단 나누기)
     renderParagraphs(document.getElementById('about-message'), data.about.message);
 
-    // 예배안내 카드
-    const worshipGrid = document.getElementById('worship-grid');
-    worshipGrid.innerHTML = '';
+    // 예배안내 테이블
+    const worshipTbody = document.getElementById('worship-tbody');
+    worshipTbody.innerHTML = '';
     data.worship.forEach(item => {
-      const div = document.createElement('div');
-      div.className = 'worship-item';
-      div.innerHTML = `<h4>${item.name}</h4><p class="time">${item.time}</p>`;
-      worshipGrid.appendChild(div);
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td>${item.name}</td><td>${item.time}</td>`;
+      worshipTbody.appendChild(tr);
     });
 
     // 빠른링크 예배시간 요약(1부/2부만)
