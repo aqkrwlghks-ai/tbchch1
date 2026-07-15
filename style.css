@@ -323,7 +323,10 @@ body {
   inset: 0;
   z-index: 1;
   background: linear-gradient(160deg, rgba(15,59,100,0.88) 0%, rgba(10,39,69,0.92) 100%);
+  opacity: 1;
+  transition: opacity 0.4s;
 }
+.hero-overlay--hidden { opacity: 0; }
 .hero-inner { position: relative; z-index: 2; max-width: 640px; margin: 0 auto; opacity: 1; transition: opacity 0.4s; }
 .hero-inner--hidden { opacity: 0; pointer-events: none; }
 .hero-eyebrow { font-size: 15px; color: #cfe0ee; margin-bottom: 12px; font-weight: 500; }

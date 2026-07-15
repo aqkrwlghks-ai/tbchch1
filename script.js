@@ -99,6 +99,7 @@ fetch('/content/site.json')
 function initHeroSlides(images) {
   const wrap = document.getElementById('heroSlides');
   const inner = document.querySelector('.hero-inner');
+  const tint = document.querySelector('.hero-overlay');
   if (!wrap || !images || images.length === 0) return;
 
   images.forEach((item, i) => {
@@ -109,8 +110,9 @@ function initHeroSlides(images) {
   });
 
   const setOverlay = (index) => {
-    if (!inner) return;
-    inner.classList.toggle('hero-inner--hidden', images[index].overlay === false);
+    const hide = images[index].overlay === false;
+    if (inner) inner.classList.toggle('hero-inner--hidden', hide);
+    if (tint) tint.classList.toggle('hero-overlay--hidden', hide);
   };
   setOverlay(0);
 
