@@ -1,6 +1,5 @@
-// 회원가입/로그인 (Supabase) — "아이디"로 로그인하지만 내부적으로는 합성 이메일을 씀
-// {아이디}@members.tbchch1.com 형태로 자동 변환해 Supabase Auth(이메일 기반)에 맞춘다.
-// (.internal 도메인은 Supabase가 유효하지 않은 이메일로 거부해서 .com으로 변경함 — 실제 메일이 오가지 않으므로 도메인 소유 여부는 무관)
+// 회원가입/로그인 (Supabase) — "연락처(전화번호)"로 로그인하지만 내부적으로는 합성 이메일을 씀
+// {전화번호 숫자만}@members.tbchch1.com 형태로 자동 변환해 Supabase Auth(이메일 기반)에 맞춘다.
 const MEMBER_EMAIL_DOMAIN = "members.tbchch1.com";
 
 function getSupabaseClient() {
@@ -11,8 +10,13 @@ function getSupabaseClient() {
   return window.__sbClient;
 }
 
-function usernameToEmail(username) {
-  return `${username.trim().toLowerCase()}@${MEMBER_EMAIL_DOMAIN}`;
+// 전화번호에서 숫자만 뽑아 로그인 식별자로 쓴다 (하이픈 있든 없든 같은 사람으로 인식)
+function phoneToKey(phone) {
+  return phone.replace(/\D/g, "");
+}
+
+function phoneToEmail(phone) {
+  return `${phoneToKey(phone)}@${MEMBER_EMAIL_DOMAIN}`;
 }
 
 function requireSupabaseClient() {
@@ -21,16 +25,16 @@ function requireSupabaseClient() {
   return sb;
 }
 
-async function checkUsernameAvailable(username) {
+async function checkPhoneAvailable(phone) {
   const sb = requireSupabaseClient();
-  const { data, error } = await sb.rpc("username_available", { check_username: username.trim().toLowerCase() });
+  const { data, error } = await sb.rpc("username_available", { check_username: phoneToKey(phone) });
   if (error) throw error;
   return data;
 }
 
-async function memberSignUp({ name, username, password, phone, position }) {
+async function memberSignUp({ name, password, phone, position }) {
   const sb = requireSupabaseClient();
-  const email = usernameToEmail(username);
+  const email = phoneToEmail(phone);
   const { data, error } = await sb.auth.signUp({ email, password });
   if (error) throw error;
   const userId = data.user && data.user.id;
@@ -38,7 +42,7 @@ async function memberSignUp({ name, username, password, phone, position }) {
 
   const { error: profileError } = await sb.from("profiles").insert({
     id: userId,
-    username: username.trim().toLowerCase(),
+    username: phoneToKey(phone),
     name: name.trim(),
     phone: phone.trim(),
     position: position.trim(),
@@ -47,9 +51,9 @@ async function memberSignUp({ name, username, password, phone, position }) {
   return data;
 }
 
-async function memberSignIn({ username, password }) {
+async function memberSignIn({ phone, password }) {
   const sb = requireSupabaseClient();
-  const email = usernameToEmail(username);
+  const email = phoneToEmail(phone);
   const { data, error } = await sb.auth.signInWithPassword({ email, password });
   if (error) throw error;
   return data;
@@ -84,7 +88,7 @@ async function renderMemberAuthArea() {
   if (profile) {
     area.innerHTML = `
       <div class="member-auth-logged">
-        <button class="member-auth-name" id="memberMenuBtn">${profile.username}님 ▾</button>
+        <button class="member-auth-name" id="memberMenuBtn">${profile.name}님 ▾</button>
         <div class="member-auth-dropdown" id="memberMenuDropdown">
           ${profile.is_admin ? '<a href="/pages/admin-members.html">관리자 모드</a>' : ''}
           <button id="memberLogoutBtn">로그아웃</button>

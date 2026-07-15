@@ -23,9 +23,6 @@
     <label>이름
       <input type="text" id="suName" required>
     </label>
-    <label>아이디
-      <input type="text" id="suUsername" required pattern="[a-z0-9_]{3,20}" title="영문 소문자, 숫자, _ 3~20자">
-    </label>
     <label>비밀번호
       <input type="password" id="suPassword" required minlength="6" autocomplete="new-password">
     </label>
@@ -53,19 +50,18 @@ document.getElementById('signupForm').addEventListener('submit', async (e) => {
   errorEl.hidden = true;
 
   const name = document.getElementById('suName').value;
-  const username = document.getElementById('suUsername').value.trim().toLowerCase();
   const password = document.getElementById('suPassword').value;
   const phone = document.getElementById('suPhone').value;
   const position = document.getElementById('suPosition').value;
 
   try {
-    const available = await checkUsernameAvailable(username);
+    const available = await checkPhoneAvailable(phone);
     if (!available) {
-      errorEl.textContent = '이미 사용 중인 아이디입니다.';
+      errorEl.textContent = '이미 가입된 연락처입니다.';
       errorEl.hidden = false;
       return;
     }
-    await memberSignUp({ name, username, password, phone, position });
+    await memberSignUp({ name, password, phone, position });
     alert('회원가입이 완료됐습니다. 로그인해주세요.');
     location.href = '/pages/login.html';
   } catch (err) {
