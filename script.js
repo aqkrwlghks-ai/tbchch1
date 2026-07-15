@@ -5,62 +5,43 @@ function formatDate(iso) {
   return iso.slice(0, 10);
 }
 
-// 구글드라이브 최신 폴더(크게) + 최근 폴더 목록을 불러와 카드로 그린다 (Netlify Function 경유)
-// 카드를 클릭하면 라이트박스로 그 폴더의 사진을 전부 보여준다 (common.js의 openFolderLightbox)
-function loadGallery(featuredId, catGridId) {
-  const featuredEl = document.getElementById(featuredId);
+// 구글드라이브 카테고리 4개(행사사진/청소년&청년/예배사진/교회학교)를 불러와 카드로 그린다 (Netlify Function 경유)
+// 카드를 클릭하면 그 카테고리 안의 행사 폴더 목록이 최신순으로 뜬다 (common.js의 openCategoryLightbox)
+function loadGallery(catGridId) {
   const catGridEl = document.getElementById(catGridId);
-  if (!featuredEl || !catGridEl) return;
+  if (!catGridEl) return;
 
   fetch('/.netlify/functions/drive-photos')
     .then(res => res.json())
     .then(data => {
-      if (data.error || !data.featuredFolder) {
-        featuredEl.innerHTML = '<p class="gallery-empty">아직 사진이 없거나 불러오지 못했습니다.</p>';
-        catGridEl.innerHTML = '';
+      const categories = data.categories || [];
+      if (data.error || categories.length === 0) {
+        catGridEl.innerHTML = '<p class="gallery-empty">아직 사진이 없거나 불러오지 못했습니다.</p>';
         return;
       }
 
-      const f = data.featuredFolder;
-      const thumb = (data.featuredPhotos && data.featuredPhotos[0] && data.featuredPhotos[0].thumb) || f.thumb;
-      featuredEl.innerHTML = `
-        <button type="button" class="gallery-featured-card" id="galleryFeaturedBtn">
-          <div class="gallery-featured-img">
-            <span class="gallery-featured-badge">NEW FEATURED ALBUM</span>
-            <span class="gallery-featured-count">${f.count}장</span>
-            <img src="${thumb}" alt="${f.name}" loading="lazy">
-          </div>
-          <div class="gallery-featured-info">
-            <p class="gallery-featured-cat">${f.category}</p>
-            <p class="gallery-featured-title">${f.name}</p>
-            <p class="gallery-featured-date">${formatDate(f.date)} 업데이트 · 사진 ${f.count}장</p>
-            <span class="btn btn-primary btn-sm" style="width:fit-content;">앨범 전체보기 →</span>
-          </div>
-        </button>`;
-      document.getElementById('galleryFeaturedBtn').addEventListener('click', () => {
-        openFolderLightbox(f.id, f.name, f.category);
-      });
-
-      catGridEl.innerHTML = (data.folders || []).map((folder, i) => `
-        <button type="button" class="gallery-cat-card" data-folder-index="${i}">
+      catGridEl.innerHTML = categories.map((cat, i) => `
+        <button type="button" class="gallery-cat-card" data-cat-index="${i}">
           <div class="gallery-cat-thumb">
-            <img src="${folder.thumb}" alt="${folder.name}" loading="lazy">
-            <span class="gallery-cat-count">${folder.count}장</span>
+            ${cat.thumb
+              ? `<img src="${cat.thumb}" alt="${cat.name}" loading="lazy">`
+              : `<div class="gallery-cat-thumb-empty">사진 없음</div>`}
+            <span class="gallery-cat-count">${cat.count}개</span>
           </div>
           <div>
-            <p class="gallery-cat-label">${folder.category}</p>
-            <p class="gallery-cat-name">${folder.name}</p>
-            <p class="gallery-cat-date">최근 업데이트 · ${formatDate(folder.date)}</p>
+            <p class="gallery-cat-label">카테고리</p>
+            <p class="gallery-cat-name">${cat.name}</p>
+            <p class="gallery-cat-date">${cat.date ? formatDate(cat.date) + ' 업데이트' : '최근 업데이트 없음'}</p>
           </div>
         </button>`).join('');
 
-      catGridEl.querySelectorAll('[data-folder-index]').forEach(btn => {
-        const folder = data.folders[Number(btn.dataset.folderIndex)];
-        btn.addEventListener('click', () => openFolderLightbox(folder.id, folder.name, folder.category));
+      catGridEl.querySelectorAll('[data-cat-index]').forEach(btn => {
+        const cat = categories[Number(btn.dataset.catIndex)];
+        btn.addEventListener('click', () => openCategoryLightbox(cat.id, cat.name));
       });
     })
     .catch(() => {
-      featuredEl.innerHTML = '<p class="gallery-empty">아직 사진이 없거나 불러오지 못했습니다.</p>';
+      catGridEl.innerHTML = '<p class="gallery-empty">아직 사진이 없거나 불러오지 못했습니다.</p>';
     });
 }
 
@@ -103,8 +84,8 @@ fetch('/content/site.json')
     iframe.src = `https://www.youtube.com/embed/videoseries?list=${data.sermon.youtube_playlist_id}`;
     document.getElementById('sermon-channel-link').href = data.sermon.youtube_channel_url;
 
-    // 갤러리: 대표 사진 + 카테고리별 최근 사진
-    loadGallery('gallery-featured', 'gallery-cat-grid');
+    // 갤러리: 카테고리 4개 요약
+    loadGallery('gallery-cat-grid');
 
     // 메인 배경 사진 슬라이드 (15초마다 자동 전환)
     initHeroSlides(data.hero.images);

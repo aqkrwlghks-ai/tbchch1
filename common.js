@@ -47,7 +47,9 @@ function openFolderLightbox(folderId, folderName, category) {
   if (!box) return;
   document.getElementById('lightboxTitle').textContent = folderName || '';
   document.getElementById('lightboxSub').textContent = category ? `${category} · 불러오는 중...` : '불러오는 중...';
-  document.getElementById('lightboxGrid').innerHTML = '<p class="lightbox-loading">사진을 불러오는 중입니다...</p>';
+  const grid = document.getElementById('lightboxGrid');
+  grid.className = 'lightbox-grid';
+  grid.innerHTML = '<p class="lightbox-loading">사진을 불러오는 중입니다...</p>';
   box.hidden = false;
 
   fetch(`/.netlify/functions/drive-photos?folder=${encodeURIComponent(folderId)}`)
@@ -55,7 +57,6 @@ function openFolderLightbox(folderId, folderName, category) {
     .then(data => {
       const photos = data.photos || [];
       document.getElementById('lightboxSub').textContent = category ? `${category} · 사진 ${photos.length}장` : `사진 ${photos.length}장`;
-      const grid = document.getElementById('lightboxGrid');
       if (photos.length === 0) {
         grid.innerHTML = '<p class="lightbox-loading">사진을 불러오지 못했습니다.</p>';
         return;
@@ -65,7 +66,49 @@ function openFolderLightbox(folderId, folderName, category) {
       ).join('');
     })
     .catch(() => {
-      document.getElementById('lightboxGrid').innerHTML = '<p class="lightbox-loading">사진을 불러오지 못했습니다.</p>';
+      grid.innerHTML = '<p class="lightbox-loading">사진을 불러오지 못했습니다.</p>';
+    });
+}
+
+// 카테고리(행사사진/청소년&청년/예배사진/교회학교) 안의 행사 폴더 목록을 최신순으로 보여준다
+// 폴더 카드를 클릭하면 같은 라이트박스 안에서 openFolderLightbox로 전환되어 사진 전체를 보여준다
+function openCategoryLightbox(categoryId, categoryName) {
+  const box = document.getElementById('photoLightbox');
+  if (!box) return;
+  document.getElementById('lightboxTitle').textContent = categoryName || '';
+  document.getElementById('lightboxSub').textContent = '불러오는 중...';
+  const grid = document.getElementById('lightboxGrid');
+  grid.className = 'lightbox-grid lightbox-grid--folders';
+  grid.innerHTML = '<p class="lightbox-loading">불러오는 중입니다...</p>';
+  box.hidden = false;
+
+  fetch(`/.netlify/functions/drive-photos?category=${encodeURIComponent(categoryId)}`)
+    .then(res => res.json())
+    .then(data => {
+      const folders = data.folders || [];
+      document.getElementById('lightboxSub').textContent = `총 ${folders.length}개`;
+      if (folders.length === 0) {
+        grid.innerHTML = '<p class="lightbox-loading">아직 등록된 사진이 없습니다.</p>';
+        return;
+      }
+      grid.innerHTML = folders.map((f, i) => `
+        <button type="button" class="gallery-cat-card" data-cf-index="${i}">
+          <div class="gallery-cat-thumb">
+            <img src="${f.thumb}" alt="${f.name}" loading="lazy">
+            <span class="gallery-cat-count">${f.count}장</span>
+          </div>
+          <div>
+            <p class="gallery-cat-name">${f.name}</p>
+            <p class="gallery-cat-date">${(f.date || '').slice(0, 10)}</p>
+          </div>
+        </button>`).join('');
+      grid.querySelectorAll('[data-cf-index]').forEach(btn => {
+        const folder = folders[Number(btn.dataset.cfIndex)];
+        btn.addEventListener('click', () => openFolderLightbox(folder.id, folder.name, categoryName));
+      });
+    })
+    .catch(() => {
+      grid.innerHTML = '<p class="lightbox-loading">불러오지 못했습니다.</p>';
     });
 }
 

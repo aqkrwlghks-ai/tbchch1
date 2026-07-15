@@ -1,9 +1,8 @@
-// 홈페이지 갤러리: 행사 폴더 목록(최신순) + 특정 폴더 안의 사진 전체 조회
+// 홈페이지 갤러리: 카테고리 4개 요약 + 카테고리 안 행사 폴더 목록(최신순) + 특정 폴더 안의 사진 전체 조회
 // 실제 폴더 구조: 최상위 폴더 → 카테고리 폴더(교회학교/예배사진/청소년&청년/행사사진) → 날짜별 행사 폴더 → 사진 파일
 // API 키는 절대 코드에 넣지 않고 Netlify 환경변수(GOOGLE_DRIVE_API_KEY)로만 읽는다.
 const PARENT_FOLDER_ID = "1tbcejmqyzPM94zowqFwv12ZYml3LMRkU";
-const MAX_FOLDERS_PER_CATEGORY = 12;
-const MAX_FOLDERS_TOTAL = 30;
+const CATEGORY_ORDER = ["행사사진", "청소년&청년", "예배사진", "교회학교"];
 
 async function driveList(query, apiKey, fields) {
   const url = `https://www.googleapis.com/drive/v3/files?${new URLSearchParams({
@@ -44,56 +43,68 @@ async function listFolderPhotos(apiKey, folderId) {
   return photos;
 }
 
-// 전체 카테고리를 훑어 "행사 폴더" 목록을 최신순으로 만든다 (폴더별 대표 썸네일 포함)
-async function listRecentFolders(apiKey) {
-  const level1 = await driveList(`'${PARENT_FOLDER_ID}' in parents and trashed = false`, apiKey, FIELDS);
-  const categoryFolders = level1.filter(isFolder);
+// 카테고리 폴더 하나 안의 행사 폴더들을 최신순으로 반환 (폴더별 대표 썸네일 포함)
+async function listEventFoldersInCategory(apiKey, categoryId) {
+  const children = await driveList(`'${categoryId}' in parents and trashed = false`, apiKey, FIELDS);
+  const eventFolders = children.filter(isFolder);
 
-  let allFolders = [];
+  const folderInfos = await Promise.all(
+    eventFolders.map(async (ev) => {
+      const files = await driveList(`'${ev.id}' in parents and trashed = false`, apiKey, FIELDS);
+      const images = files.filter(isImage).map(toPhoto);
+      images.sort((a, b) => new Date(b.createdTime) - new Date(a.createdTime));
+      if (images.length === 0) return null;
+      return {
+        id: ev.id,
+        name: ev.name,
+        date: images[0].createdTime,
+        thumb: images[0].thumb,
+        count: images.length,
+      };
+    })
+  );
 
-  for (const cat of categoryFolders) {
-    const catChildren = await driveList(`'${cat.id}' in parents and trashed = false`, apiKey, FIELDS);
-    const eventFolders = catChildren
-      .filter(isFolder)
-      .sort((a, b) => new Date(b.createdTime) - new Date(a.createdTime))
-      .slice(0, MAX_FOLDERS_PER_CATEGORY);
+  let folders = folderInfos.filter(Boolean);
 
-    const folderInfos = await Promise.all(
-      eventFolders.map(async (ev) => {
-        const files = await driveList(`'${ev.id}' in parents and trashed = false`, apiKey, FIELDS);
-        const images = files.filter(isImage).map(toPhoto);
-        images.sort((a, b) => new Date(b.createdTime) - new Date(a.createdTime));
-        if (images.length === 0) return null;
-        return {
-          id: ev.id,
-          name: ev.name,
-          category: cat.name,
-          date: images[0].createdTime,
-          thumb: images[0].thumb,
-          count: images.length,
-        };
-      })
-    );
-
-    allFolders = allFolders.concat(folderInfos.filter(Boolean));
-
-    // 카테고리 폴더에 바로 사진이 있는 경우도(하위폴더 없이) 하나의 "폴더"처럼 취급
-    const directImages = catChildren.filter(isImage).map(toPhoto);
-    if (directImages.length > 0) {
-      directImages.sort((a, b) => new Date(b.createdTime) - new Date(a.createdTime));
-      allFolders.push({
-        id: cat.id,
-        name: cat.name,
-        category: cat.name,
-        date: directImages[0].createdTime,
-        thumb: directImages[0].thumb,
-        count: directImages.length,
-      });
-    }
+  // 카테고리 폴더에 바로 사진이 있는 경우(하위폴더 없이)도 하나의 앨범처럼 취급
+  const directImages = children.filter(isImage).map(toPhoto);
+  if (directImages.length > 0) {
+    directImages.sort((a, b) => new Date(b.createdTime) - new Date(a.createdTime));
+    folders.push({
+      id: categoryId,
+      name: "기타 사진",
+      date: directImages[0].createdTime,
+      thumb: directImages[0].thumb,
+      count: directImages.length,
+    });
   }
 
-  allFolders.sort((a, b) => new Date(b.date) - new Date(a.date));
-  return allFolders.slice(0, MAX_FOLDERS_TOTAL);
+  folders.sort((a, b) => new Date(b.date) - new Date(a.date));
+  return folders;
+}
+
+// 최상위 카테고리 4개의 요약 정보(대표 썸네일 · 앨범 개수 · 최근 업데이트일)를 정해진 순서로 반환
+async function listCategories(apiKey) {
+  const level1 = await driveList(`'${PARENT_FOLDER_ID}' in parents and trashed = false`, apiKey, FIELDS);
+  const categoryFolders = level1.filter(isFolder).sort((a, b) => {
+    const ia = CATEGORY_ORDER.indexOf(a.name);
+    const ib = CATEGORY_ORDER.indexOf(b.name);
+    return (ia === -1 ? 999 : ia) - (ib === -1 ? 999 : ib);
+  });
+
+  return Promise.all(
+    categoryFolders.map(async (cat) => {
+      const eventFolders = await listEventFoldersInCategory(apiKey, cat.id);
+      const latest = eventFolders[0] || null;
+      return {
+        id: cat.id,
+        name: cat.name,
+        count: eventFolders.length,
+        date: latest ? latest.date : null,
+        thumb: latest ? latest.thumb : null,
+      };
+    })
+  );
 }
 
 exports.handler = async function (event) {
@@ -102,10 +113,12 @@ exports.handler = async function (event) {
     return { statusCode: 500, body: JSON.stringify({ error: "GOOGLE_DRIVE_API_KEY 환경변수가 설정되지 않았습니다." }) };
   }
 
-  const folderId = event.queryStringParameters && event.queryStringParameters.folder;
+  const params = event.queryStringParameters || {};
+  const folderId = params.folder;
+  const categoryId = params.category;
 
   try {
-    // 특정 폴더의 사진 전체를 요청한 경우
+    // 특정 폴더(행사 폴더)의 사진 전체를 요청한 경우
     if (folderId) {
       const photos = await listFolderPhotos(apiKey, folderId);
       return {
@@ -115,21 +128,23 @@ exports.handler = async function (event) {
       };
     }
 
-    // 기본: 최신순 행사 폴더 목록 + 대표(featured) 폴더
-    const folders = await listRecentFolders(apiKey);
-    const featuredFolder = folders[0] || null;
-    let featuredPhotos = [];
-    if (featuredFolder) {
-      featuredPhotos = await listFolderPhotos(apiKey, featuredFolder.id);
+    // 카테고리 안의 행사 폴더 목록(최신순)을 요청한 경우
+    if (categoryId) {
+      const folders = await listEventFoldersInCategory(apiKey, categoryId);
+      return {
+        statusCode: 200,
+        headers: { "Content-Type": "application/json", "Cache-Control": "public, max-age=900" },
+        body: JSON.stringify({ folders }),
+      };
     }
 
+    // 기본: 최상위 카테고리 4개 요약
+    const categories = await listCategories(apiKey);
     return {
       statusCode: 200,
       headers: { "Content-Type": "application/json", "Cache-Control": "public, max-age=900" },
       body: JSON.stringify({
-        featuredFolder,
-        featuredPhotos,
-        folders: folders.slice(1),
+        categories,
         driveFolderUrl: `https://drive.google.com/drive/folders/${PARENT_FOLDER_ID}`,
       }),
     };
