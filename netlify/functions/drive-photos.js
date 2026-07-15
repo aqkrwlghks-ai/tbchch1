@@ -35,6 +35,16 @@ function toPhoto(p) {
 
 const FIELDS = "files(id,name,mimeType,thumbnailLink,webViewLink,createdTime)";
 
+// 행사 폴더 이름 맨 앞의 YYYYMMDD를 실제 행사 날짜로 해석한다 (예: "20260607 한우리교회 선교예배" → 2026-06-07)
+function parseFolderDate(name) {
+  const m = name && name.match(/^(\d{4})(\d{2})(\d{2})/);
+  if (!m) return null;
+  const [, y, mo, d] = m;
+  const date = new Date(Date.UTC(Number(y), Number(mo) - 1, Number(d)));
+  if (isNaN(date.getTime())) return null;
+  return date.toISOString();
+}
+
 // 특정 폴더(행사 폴더) 안의 사진 전체를 최신순으로 반환
 async function listFolderPhotos(apiKey, folderId) {
   const files = await driveList(`'${folderId}' in parents and trashed = false`, apiKey, FIELDS);
@@ -57,7 +67,7 @@ async function listEventFoldersInCategory(apiKey, categoryId) {
       return {
         id: ev.id,
         name: ev.name,
-        date: images[0].createdTime,
+        date: parseFolderDate(ev.name) || images[0].createdTime,
         thumb: images[0].thumb,
         count: images.length,
       };
