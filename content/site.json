@@ -5,7 +5,14 @@
     "verse_line1": "성령의 능력 안에서 복음과 섬김으로",
     "verse_line2": "하나님의 영광을 드러내는 교회",
     "reference": "이사야 43:21 · 고린도후서 5:18",
-    "images": []
+    "images": [
+      { "image": "/admin/uploads/hero/hero-001.jpg" },
+      { "image": "/admin/uploads/hero/hero-002.jpg", "overlay": false },
+      { "image": "/admin/uploads/hero/hero-003.jpg", "overlay": false },
+      { "image": "/admin/uploads/hero/hero-004.jpg", "overlay": false },
+      { "image": "/admin/uploads/hero/hero-005.jpg", "overlay": false },
+      { "image": "/admin/uploads/hero/hero-006.jpg", "overlay": false }
+    ]
   },
   "about": {
     "lead": "기독교대한성결교회 빛나는교회",

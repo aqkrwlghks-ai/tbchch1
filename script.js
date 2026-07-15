@@ -95,8 +95,10 @@ fetch('/content/site.json')
   })
   .catch(err => console.error('site.json 로드 실패:', err));
 
+// 이미지 자체에 이미 문구가 박혀있는 슬라이드(overlay:false)는 사이트 자체 제목/성구 문구를 숨긴다
 function initHeroSlides(images) {
   const wrap = document.getElementById('heroSlides');
+  const inner = document.querySelector('.hero-inner');
   if (!wrap || !images || images.length === 0) return;
 
   images.forEach((item, i) => {
@@ -106,6 +108,12 @@ function initHeroSlides(images) {
     wrap.appendChild(div);
   });
 
+  const setOverlay = (index) => {
+    if (!inner) return;
+    inner.classList.toggle('hero-inner--hidden', images[index].overlay === false);
+  };
+  setOverlay(0);
+
   if (images.length <= 1) return;
 
   const slides = wrap.querySelectorAll('.hero-slide');
@@ -114,6 +122,7 @@ function initHeroSlides(images) {
     slides[current].classList.remove('active');
     current = (current + 1) % slides.length;
     slides[current].classList.add('active');
+    setOverlay(current);
   }, 15000);
 }
 
