@@ -14,15 +14,21 @@ function usernameToEmail(username) {
   return `${username.trim().toLowerCase()}@${MEMBER_EMAIL_DOMAIN}`;
 }
 
-async function checkUsernameAvailable(username) {
+function requireSupabaseClient() {
   const sb = getSupabaseClient();
+  if (!sb) throw new Error("회원 시스템 준비 중입니다. 잠시 후 다시 시도해주세요.");
+  return sb;
+}
+
+async function checkUsernameAvailable(username) {
+  const sb = requireSupabaseClient();
   const { data, error } = await sb.rpc("username_available", { check_username: username.trim().toLowerCase() });
   if (error) throw error;
   return data;
 }
 
 async function memberSignUp({ name, username, password, phone, position }) {
-  const sb = getSupabaseClient();
+  const sb = requireSupabaseClient();
   const email = usernameToEmail(username);
   const { data, error } = await sb.auth.signUp({ email, password });
   if (error) throw error;
@@ -41,7 +47,7 @@ async function memberSignUp({ name, username, password, phone, position }) {
 }
 
 async function memberSignIn({ username, password }) {
-  const sb = getSupabaseClient();
+  const sb = requireSupabaseClient();
   const email = usernameToEmail(username);
   const { data, error } = await sb.auth.signInWithPassword({ email, password });
   if (error) throw error;
@@ -69,7 +75,8 @@ async function renderMemberAuthArea() {
   if (!area) return;
   const sb = getSupabaseClient();
   if (!sb) {
-    area.innerHTML = "";
+    // Supabase 연동 전이라도 로그인/회원가입 링크는 항상 보이게 한다
+    area.innerHTML = `<a href="/pages/login.html">로그인</a><span class="member-auth-sep">/</span><a href="/pages/signup.html">회원가입</a>`;
     return;
   }
   const profile = await getCurrentProfile();
