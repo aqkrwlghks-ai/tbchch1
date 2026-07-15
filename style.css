@@ -627,17 +627,29 @@ section { padding: 88px 0; }
 }
 
 @media (max-width: 720px) {
-  .nav {
+  .megamenu {
     position: absolute;
     top: 100%; left: 0; right: 0;
     background: #fff;
     flex-direction: column;
-    padding: 16px 24px;
-    gap: 16px;
+    gap: 0;
+    padding: 8px 24px 16px;
     display: none;
     border-bottom: 1px solid var(--border-light);
+    max-height: 75vh;
+    overflow-y: auto;
   }
-  .nav.open { display: flex; }
+  .megamenu.open { display: flex; }
+  .mm-item { width: 100%; }
+  .mm-trigger { width: 100%; justify-content: space-between; padding: 13px 4px; font-size: 15.5px; }
+  .mm-panel {
+    position: static;
+    box-shadow: none;
+    border-radius: 0;
+    padding: 0 0 6px 14px;
+    min-width: 0;
+  }
+  .mm-panel a { padding: 10px 6px; }
   .nav-toggle { display: flex; }
   .header-inner .btn-sm { display: none; }
   .hero-title { font-size: 42px; }
