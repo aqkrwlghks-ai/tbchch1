@@ -1,6 +1,7 @@
 // 회원가입/로그인 (Supabase) — "아이디"로 로그인하지만 내부적으로는 합성 이메일을 씀
-// {아이디}@members.tbchch1.internal 형태로 자동 변환해 Supabase Auth(이메일 기반)에 맞춘다.
-const MEMBER_EMAIL_DOMAIN = "members.tbchch1.internal";
+// {아이디}@members.tbchch1.com 형태로 자동 변환해 Supabase Auth(이메일 기반)에 맞춘다.
+// (.internal 도메인은 Supabase가 유효하지 않은 이메일로 거부해서 .com으로 변경함 — 실제 메일이 오가지 않으므로 도메인 소유 여부는 무관)
+const MEMBER_EMAIL_DOMAIN = "members.tbchch1.com";
 
 function getSupabaseClient() {
   if (!window.supabase || !window.SUPABASE_URL || !window.SUPABASE_ANON_KEY) return null;
