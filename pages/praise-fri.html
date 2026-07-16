@@ -35,22 +35,20 @@
 <script src="/supabase-config.js"></script>
 <script src="/member-auth.js"></script>
 <script src="/common.js"></script>
+<script src="/sermons-data.js"></script>
 <script>
 function escHtml(s) { return (s || '').toString().replace(/&/g,'&amp;').replace(/</g,'&lt;'); }
-fetch('/content/sermons.json')
-  .then(res => res.json())
-  .then(data => {
-    const tbody = document.getElementById('sermon-tbody');
-    const category = tbody.dataset.category;
-    const items = (data.sermons || [])
-      .filter(s => s.category === category)
-      .sort((a, b) => new Date(b.date) - new Date(a.date));
+(async function () {
+  const tbody = document.getElementById('sermon-tbody');
+  const category = tbody.dataset.category;
+  try {
+    const items = await fetchSermons(category);
     if (items.length === 0) {
       document.getElementById('sermon-empty').hidden = false;
       return;
     }
     tbody.innerHTML = items.map((s, i) => {
-      const link = `/pages/sermon-view.html?category=${encodeURIComponent(category)}&date=${encodeURIComponent(s.date || '')}&title=${encodeURIComponent(s.title || '')}`;
+      const link = `/pages/sermon-view.html?id=${encodeURIComponent(s.id)}`;
       return `
       <tr>
         <td>${items.length - i}</td>
@@ -61,10 +59,10 @@ fetch('/content/sermons.json')
         <td>${s.video_url ? `<a href="${link}" class="sermon-watch" aria-label="영상보기">▶</a>` : ''}</td>
       </tr>`;
     }).join('');
-  })
-  .catch(() => {
+  } catch (err) {
     document.getElementById('sermon-empty').hidden = false;
-  });
+  }
+})();
 </script>
 </body>
 </html>

@@ -828,3 +828,25 @@ section { padding: 88px 0; }
 @media (max-width: 780px) {
   .sermon-view { grid-template-columns: 1fr; }
 }
+
+/* ---------- 말씀과 찬양: 관리자 글쓰기 폼 ---------- */
+.sermon-form { display: flex; flex-direction: column; gap: 16px; }
+.sermon-form label {
+  display: flex; flex-direction: column; gap: 6px;
+  font-size: 13.5px; font-weight: 600; color: var(--text-dark);
+}
+.sermon-form input, .sermon-form select, .sermon-form textarea {
+  font-family: var(--font-body);
+  font-size: 15px;
+  padding: 11px 14px;
+  border: 1px solid var(--border-light);
+  border-radius: 8px;
+  outline: none;
+  resize: vertical;
+}
+.sermon-form input:focus, .sermon-form select:focus, .sermon-form textarea:focus { border-color: var(--navy); }
+.sermon-form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.sermon-form-actions { display: flex; gap: 10px; }
+@media (max-width: 560px) {
+  .sermon-form-row { grid-template-columns: 1fr; }
+}

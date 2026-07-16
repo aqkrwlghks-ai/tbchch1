@@ -90,7 +90,7 @@ async function renderMemberAuthArea() {
       <div class="member-auth-logged">
         <button class="member-auth-name" id="memberMenuBtn">${profile.name}님 ▾</button>
         <div class="member-auth-dropdown" id="memberMenuDropdown">
-          ${profile.is_admin ? '<a href="/pages/admin-members.html">관리자 모드</a>' : ''}
+          ${profile.is_admin ? '<a href="/pages/admin-members.html">회원 관리</a><a href="/pages/admin-sermons.html">말씀과 찬양 관리</a>' : ''}
           <button id="memberLogoutBtn">로그아웃</button>
         </div>
       </div>`;

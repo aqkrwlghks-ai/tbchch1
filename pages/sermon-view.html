@@ -41,6 +41,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script src="/supabase-config.js"></script>
 <script src="/member-auth.js"></script>
+<script src="/sermons-data.js"></script>
 <script src="/common.js"></script>
 <script>
 function escHtml(s) { return (s || '').toString().replace(/&/g,'&amp;').replace(/</g,'&lt;'); }
@@ -60,25 +61,17 @@ const CATEGORY_LABELS = {
 };
 
 const params = new URLSearchParams(location.search);
-const category = params.get('category') || '';
-const dateParam = params.get('date') || '';
-const titleParam = params.get('title') || '';
+const idParam = params.get('id') || '';
 
-fetch('/content/sermons.json')
-  .then(res => res.json())
-  .then(data => {
-    const items = (data.sermons || []).filter(s => s.category === category);
-    const current = items.find(s => (s.date || '') === dateParam && (s.title || '') === titleParam) || items[0];
+(async function () {
+  try {
+    const current = await fetchSermonById(idParam);
+    const category = current.category;
+    const items = await fetchSermons(category);
 
     const label = CATEGORY_LABELS[category] || '말씀과 찬양';
     document.getElementById('sermonBadge').textContent = label.toUpperCase();
     document.getElementById('sermonPageTitle').textContent = label;
-
-    if (!current) {
-      document.getElementById('sermonTitle').textContent = '내용을 찾을 수 없습니다.';
-      document.querySelector('.sermon-view-meta').hidden = true;
-      return;
-    }
 
     document.getElementById('sermonTitle').textContent = current.title || '';
     document.getElementById('sermonSpeaker').textContent = current.speaker || '-';
@@ -97,20 +90,20 @@ fetch('/content/sermons.json')
       videoWrap.remove();
     }
 
-    const sorted = items.slice().sort((a, b) => new Date(b.date) - new Date(a.date));
     const sideList = document.getElementById('sermonSideList');
-    sideList.innerHTML = sorted.map(s => {
-      const isCurrent = s === current;
-      const link = `/pages/sermon-view.html?category=${encodeURIComponent(category)}&date=${encodeURIComponent(s.date || '')}&title=${encodeURIComponent(s.title || '')}`;
+    sideList.innerHTML = items.map(s => {
+      const isCurrent = s.id === current.id;
+      const link = `/pages/sermon-view.html?id=${encodeURIComponent(s.id)}`;
       return `<li class="${isCurrent ? 'active' : ''}"><a href="${link}">
         <span class="sermon-side-title">${escHtml(s.title)}</span>
         <span class="sermon-side-date">${(s.date || '').slice(0, 10)}</span>
       </a></li>`;
     }).join('');
-  })
-  .catch(() => {
-    document.getElementById('sermonTitle').textContent = '불러오지 못했습니다.';
-  });
+  } catch (err) {
+    document.getElementById('sermonTitle').textContent = '내용을 찾을 수 없습니다.';
+    document.querySelector('.sermon-view-meta').hidden = true;
+  }
+})();
 </script>
 </body>
 </html>

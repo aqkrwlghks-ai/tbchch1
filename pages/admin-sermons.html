@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>말씀과 찬양 관리 · 빛나는교회</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%230f3b64%22/><text x=%2250%22 y=%2268%22 font-size=%2255%22 text-anchor=%22middle%22 fill=%22white%22>%E2%9C%A6</text></svg>">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<div id="headerHost"></div>
+
+<section class="page-hero">
+  <span class="page-badge">ADMIN</span>
+  <h1>말씀과 찬양 관리</h1>
+  <p>주일설교·수요설교·금요설교·수요찬양·금요찬양 글을 쓰고 관리합니다.</p>
+  <div class="bar"></div>
+</section>
+
+<div class="page-body" style="max-width:900px;">
+  <div id="adminGuard" class="admin-guard" hidden>
+    <p>관리자만 접근할 수 있는 페이지입니다.</p>
+    <p style="margin-top:8px;"><a href="/pages/login.html">로그인</a> 후 다시 시도해주세요.</p>
+  </div>
+
+  <div id="adminContent" hidden>
+    <form id="sermonForm" class="sermon-form">
+      <input type="hidden" id="sermonId">
+      <div class="sermon-form-row">
+        <label>분류
+          <select id="fCategory" required>
+            <option value="sermon-sunday">주일설교</option>
+            <option value="sermon-wed">수요설교</option>
+            <option value="sermon-fri">금요설교</option>
+            <option value="praise-wed">수요찬양</option>
+            <option value="praise-fri">금요찬양</option>
+          </select>
+        </label>
+        <label>날짜
+          <input type="date" id="fDate" required>
+        </label>
+      </div>
+      <label>제목
+        <input type="text" id="fTitle" required placeholder="예: 복 많은 인생">
+      </label>
+      <div class="sermon-form-row">
+        <label>본문 (성경 구절)
+          <input type="text" id="fScripture" placeholder="예: 시편 1:1-3">
+        </label>
+        <label>설교자 / 인도자
+          <input type="text" id="fSpeaker" placeholder="예: 김제희 목사">
+        </label>
+      </div>
+      <label>영상 링크주소 (유튜브 등)
+        <input type="text" id="fVideoUrl" placeholder="https://www.youtube.com/watch?v=...">
+      </label>
+      <label>상세 내용 (순서, 설명 등)
+        <textarea id="fBody" rows="6" placeholder="예배 순서나 말씀 요약 등을 자유롭게 적어주세요."></textarea>
+      </label>
+      <div class="sermon-form-actions">
+        <button type="submit" class="btn btn-primary" id="sermonSubmitBtn">등록하기</button>
+        <button type="button" class="btn btn-ghost" id="sermonCancelEditBtn" hidden>수정 취소</button>
+      </div>
+      <p class="auth-error" id="sermonFormError" hidden></p>
+    </form>
+
+    <div class="admin-toolbar" style="margin-top:36px;">
+      <p id="sermonListTitle" style="font-weight:700;">등록된 글</p>
+      <select id="fFilterCategory">
+        <option value="">전체 분류</option>
+        <option value="sermon-sunday">주일설교</option>
+        <option value="sermon-wed">수요설교</option>
+        <option value="sermon-fri">금요설교</option>
+        <option value="praise-wed">수요찬양</option>
+        <option value="praise-fri">금요찬양</option>
+      </select>
+    </div>
+    <div class="sermon-table-wrap">
+      <table class="sermon-table">
+        <thead>
+          <tr><th>분류</th><th>제목</th><th>날짜</th><th>관리</th></tr>
+        </thead>
+        <tbody id="sermonAdminTbody"></tbody>
+      </table>
+    </div>
+    <p class="sermon-empty" id="sermonAdminEmpty" hidden>등록된 글이 없습니다.</p>
+  </div>
+</div>
+
+<div id="footerHost"></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="/supabase-config.js"></script>
+<script src="/member-auth.js"></script>
+<script src="/sermons-data.js"></script>
+<script src="/common.js"></script>
+<script>
+const CATEGORY_LABELS = {
+  'sermon-sunday': '주일설교',
+  'sermon-wed': '수요설교',
+  'sermon-fri': '금요설교',
+  'praise-wed': '수요찬양',
+  'praise-fri': '금요찬양'
+};
+
+function esc(s) { return (s || '').toString().replace(/&/g,'&amp;').replace(/</g,'&lt;'); }
+
+let __allSermons = [];
+
+function resetForm() {
+  document.getElementById('sermonId').value = '';
+  document.getElementById('sermonForm').reset();
+  document.getElementById('sermonSubmitBtn').textContent = '등록하기';
+  document.getElementById('sermonCancelEditBtn').hidden = true;
+}
+
+async function loadSermonList() {
+  const filter = document.getElementById('fFilterCategory').value;
+  __allSermons = await fetchSermons(filter || undefined);
+  const tbody = document.getElementById('sermonAdminTbody');
+  const empty = document.getElementById('sermonAdminEmpty');
+  if (__allSermons.length === 0) {
+    tbody.innerHTML = '';
+    empty.hidden = false;
+    return;
+  }
+  empty.hidden = true;
+  tbody.innerHTML = __allSermons.map(s => `
+    <tr>
+      <td>${esc(CATEGORY_LABELS[s.category] || s.category)}</td>
+      <td class="sermon-title">${esc(s.title)}</td>
+      <td>${(s.date || '').slice(0, 10)}</td>
+      <td>
+        <button type="button" class="btn btn-ghost btn-sm" data-edit="${s.id}">수정</button>
+        <button type="button" class="btn btn-ghost btn-sm" data-delete="${s.id}">삭제</button>
+      </td>
+    </tr>`).join('');
+
+  tbody.querySelectorAll('[data-edit]').forEach(btn => {
+    btn.addEventListener('click', () => startEdit(btn.dataset.edit));
+  });
+  tbody.querySelectorAll('[data-delete]').forEach(btn => {
+    btn.addEventListener('click', () => removeSermon(btn.dataset.delete));
+  });
+}
+
+function startEdit(id) {
+  const s = __allSermons.find(x => x.id === id);
+  if (!s) return;
+  document.getElementById('sermonId').value = s.id;
+  document.getElementById('fCategory').value = s.category;
+  document.getElementById('fDate').value = (s.date || '').slice(0, 10);
+  document.getElementById('fTitle').value = s.title || '';
+  document.getElementById('fScripture').value = s.scripture || '';
+  document.getElementById('fSpeaker').value = s.speaker || '';
+  document.getElementById('fVideoUrl').value = s.video_url || '';
+  document.getElementById('fBody').value = s.body || '';
+  document.getElementById('sermonSubmitBtn').textContent = '수정 저장';
+  document.getElementById('sermonCancelEditBtn').hidden = false;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+async function removeSermon(id) {
+  if (!confirm('이 글을 삭제할까요? 되돌릴 수 없습니다.')) return;
+  try {
+    await deleteSermon(id);
+    await loadSermonList();
+  } catch (err) {
+    alert('삭제 중 오류가 발생했습니다: ' + err.message);
+  }
+}
+
+document.getElementById('sermonCancelEditBtn').addEventListener('click', resetForm);
+document.getElementById('fFilterCategory').addEventListener('change', loadSermonList);
+
+document.getElementById('sermonForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const errorEl = document.getElementById('sermonFormError');
+  errorEl.hidden = true;
+  const id = document.getElementById('sermonId').value;
+  const payload = {
+    category: document.getElementById('fCategory').value,
+    date: document.getElementById('fDate').value,
+    title: document.getElementById('fTitle').value.trim(),
+    scripture: document.getElementById('fScripture').value.trim(),
+    speaker: document.getElementById('fSpeaker').value.trim(),
+    video_url: document.getElementById('fVideoUrl').value.trim(),
+    body: document.getElementById('fBody').value.trim(),
+  };
+  try {
+    if (id) {
+      await updateSermon(id, payload);
+    } else {
+      await createSermon(payload);
+    }
+    resetForm();
+    await loadSermonList();
+  } catch (err) {
+    errorEl.textContent = '저장 중 오류가 발생했습니다: ' + err.message;
+    errorEl.hidden = false;
+  }
+});
+
+async function initAdminSermonsPage() {
+  const profile = await getCurrentProfile();
+  if (!profile || !profile.is_admin) {
+    document.getElementById('adminGuard').hidden = false;
+    return;
+  }
+  document.getElementById('adminContent').hidden = false;
+  await loadSermonList();
+}
+
+document.addEventListener('DOMContentLoaded', () => setTimeout(initAdminSermonsPage, 400));
+</script>
+</body>
+</html>
