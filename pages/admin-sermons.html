@@ -209,13 +209,19 @@ async function initAdminSermonsPage() {
   }
   document.getElementById('adminContent').hidden = false;
 
-  const categoryParam = new URLSearchParams(location.search).get('category');
+  const searchParams = new URLSearchParams(location.search);
+  const categoryParam = searchParams.get('category');
   if (categoryParam) {
     document.getElementById('fCategory').value = categoryParam;
     document.getElementById('fFilterCategory').value = categoryParam;
   }
 
   await loadSermonList();
+
+  const editParam = searchParams.get('edit');
+  if (editParam) {
+    startEdit(editParam);
+  }
 }
 
 document.addEventListener('DOMContentLoaded', () => setTimeout(initAdminSermonsPage, 400));

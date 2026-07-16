@@ -18,20 +18,38 @@
   <div class="bar"></div>
 </section>
 
-<div class="page-body" style="max-width:980px;">
-  <div class="community-board-header" style="margin-top:0;">
-    <div></div>
-    <a href="/pages/admin-sermons.html" class="btn btn-primary btn-sm" id="sermonWriteBtn" hidden>글쓰기</a>
+<div class="page-body" style="max-width:1100px;">
+  <div class="sermon-layout">
+    <aside class="sermon-sidebar">
+    <div class="sermon-sidebar-title">설교와 찬양</div>
+    <div class="sermon-sidebar-group-title">말씀</div>
+    <div class="sermon-sidebar-links">
+      <a href="/pages/sermon-sunday.html">주일설교</a>
+      <a href="/pages/sermon-wed.html">수요설교</a>
+      <a href="/pages/sermon-fri.html">금요설교</a>
+    </div>
+    <div class="sermon-sidebar-group-title">찬양</div>
+    <div class="sermon-sidebar-links">
+      <a href="/pages/praise-wed.html">수요찬양</a>
+      <a href="/pages/praise-fri.html" class="active">금요찬양</a>
+    </div>
+  </aside>
+    <div class="sermon-main">
+      <div class="community-board-header" style="margin-top:0;">
+        <div></div>
+        <a href="/pages/admin-sermons.html" class="btn btn-primary btn-sm" id="sermonWriteBtn" hidden>글쓰기</a>
+      </div>
+      <div class="sermon-table-wrap">
+        <table class="sermon-table">
+          <thead>
+            <tr><th>번호</th><th>제목</th><th>본문</th><th>설교자</th><th>날짜</th><th>보기</th></tr>
+          </thead>
+          <tbody id="sermon-tbody" data-category="praise-fri"></tbody>
+        </table>
+      </div>
+      <p class="sermon-empty" id="sermon-empty" hidden>아직 등록된 말씀이 없습니다.</p>
+    </div>
   </div>
-  <div class="sermon-table-wrap">
-    <table class="sermon-table">
-      <thead>
-        <tr><th>번호</th><th>제목</th><th>본문</th><th>설교자</th><th>날짜</th><th>보기</th></tr>
-      </thead>
-      <tbody id="sermon-tbody" data-category="praise-fri"></tbody>
-    </table>
-  </div>
-  <p class="sermon-empty" id="sermon-empty" hidden>아직 등록된 말씀이 없습니다.</p>
 </div>
 
 <div id="footerHost"></div>

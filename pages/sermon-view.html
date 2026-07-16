@@ -29,6 +29,10 @@
         <p><strong>날짜</strong> <span id="sermonDate"></span></p>
       </div>
       <div class="sermon-view-body" id="sermonBody"></div>
+      <div class="sermon-form-actions" style="margin-top:20px;">
+        <a href="#" class="btn btn-ghost" id="sermonEditBtn" hidden>수정</a>
+        <button type="button" class="btn btn-ghost" id="sermonDeleteBtn" hidden>삭제</button>
+      </div>
     </div>
     <aside class="sermon-view-side">
       <h3>목록</h3>
@@ -99,6 +103,25 @@ const idParam = params.get('id') || '';
         <span class="sermon-side-date">${(s.date || '').slice(0, 10)}</span>
       </a></li>`;
     }).join('');
+
+    const profile = await getCurrentProfile();
+    if (profile && profile.is_admin) {
+      const editBtn = document.getElementById('sermonEditBtn');
+      editBtn.hidden = false;
+      editBtn.href = `/pages/admin-sermons.html?edit=${encodeURIComponent(current.id)}`;
+
+      const deleteBtn = document.getElementById('sermonDeleteBtn');
+      deleteBtn.hidden = false;
+      deleteBtn.addEventListener('click', async () => {
+        if (!confirm('이 글을 삭제할까요? 되돌릴 수 없습니다.')) return;
+        try {
+          await deleteSermon(current.id);
+          location.href = `/pages/${category}.html`;
+        } catch (err) {
+          alert('삭제 중 오류가 발생했습니다: ' + err.message);
+        }
+      });
+    }
   } catch (err) {
     document.getElementById('sermonTitle').textContent = '내용을 찾을 수 없습니다.';
     document.querySelector('.sermon-view-meta').hidden = true;

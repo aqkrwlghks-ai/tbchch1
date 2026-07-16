@@ -798,6 +798,31 @@ section { padding: 88px 0; }
 }
 .sermon-empty { text-align: center; color: var(--text-gray); padding: 40px 0; }
 
+.sermon-layout { display: flex; gap: 28px; align-items: flex-start; }
+.sermon-sidebar { width: 210px; flex-shrink: 0; }
+.sermon-sidebar-title {
+  background: var(--navy); color: #fff; text-align: center;
+  padding: 14px; border-radius: 10px; font-weight: 700; font-size: 15px;
+  margin-bottom: 14px;
+}
+.sermon-sidebar-group-title { font-size: 12.5px; font-weight: 700; color: var(--text-gray); padding: 12px 4px 6px; letter-spacing: 0.3px; }
+.sermon-sidebar-links { display: flex; flex-direction: column; }
+.sermon-sidebar-links a {
+  padding: 10px 14px; font-size: 14px; color: var(--text-dark); text-decoration: none;
+  border-left: 2px solid var(--border-light); border-radius: 0 8px 8px 0;
+}
+.sermon-sidebar-links a:hover { color: var(--navy); background: var(--bg-cool); }
+.sermon-sidebar-links a.active { color: var(--navy); font-weight: 700; border-left-color: var(--navy); background: var(--bg-cool); }
+.sermon-main { flex: 1; min-width: 0; }
+
+@media (max-width: 820px) {
+  .sermon-layout { flex-direction: column; }
+  .sermon-sidebar { width: 100%; }
+  .sermon-sidebar-links { flex-direction: row; flex-wrap: wrap; }
+  .sermon-sidebar-links a { border-left: none; border-bottom: 2px solid var(--border-light); border-radius: 0; }
+  .sermon-sidebar-links a.active { border-bottom-color: var(--navy); }
+}
+
 /* ---------- 말씀과 찬양: 상세보기 ---------- */
 .sermon-view { display: grid; grid-template-columns: 1fr 280px; gap: 32px; align-items: start; }
 .sermon-view-title { font-size: 22px; margin: 20px 0 12px; }
