@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>주간말씀 관리 · 빛나는교회</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%230f3b64%22/><text x=%2250%22 y=%2268%22 font-size=%2255%22 text-anchor=%22middle%22 fill=%22white%22>✦</text></svg>">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
+<link rel="stylesheet" href="/style.css">
+<style>
+  .admin-tabs { display:flex; gap:8px; margin-bottom:24px; flex-wrap:wrap; }
+  .admin-tab { padding:9px 16px; border-radius:8px; border:1.5px solid var(--border-light); background:#fff; color:var(--text-dark); font-size:14px; font-weight:600; cursor:pointer; }
+  .admin-tab.active { background:var(--navy); color:#fff; border-color:var(--navy); }
+  .admin-tab-panel { display:none; }
+  .admin-tab-panel.active { display:block; }
+  .field-hint { font-size:12.5px; color:var(--text-gray); margin-top:-8px; }
+</style>
+</head>
+<body>
+<div id="headerHost"></div>
+
+<section class="page-hero">
+  <span class="page-badge">ADMIN</span>
+  <h1>주간말씀 관리</h1>
+  <p>설교 인포그래픽 · 주간묵상집을 작성하고, 소그룹나눔 게시글을 관리합니다.</p>
+  <div class="bar"></div>
+</section>
+
+<div class="page-body" style="max-width:900px;">
+  <div id="adminGuard" class="admin-guard" hidden>
+    <p>관리자만 접근할 수 있는 페이지입니다.</p>
+    <p style="margin-top:8px;"><a href="/pages/login.html">로그인</a> 후 다시 시도해주세요.</p>
+  </div>
+
+  <div id="adminContent" hidden>
+    <div class="admin-tabs">
+      <button type="button" class="admin-tab active" data-tab="infographic">🎨 설교 인포그래픽</button>
+      <button type="button" class="admin-tab" data-tab="weekly">📖 주간묵상집</button>
+      <button type="button" class="admin-tab" data-tab="share">🤝 소그룹나눔 (관리)</button>
+    </div>
+
+    <!-- 설교 인포그래픽 -->
+    <div class="admin-tab-panel active" id="panel-infographic">
+      <form id="form-infographic" class="sermon-form">
+        <input type="hidden" id="ig-id">
+        <label>제목
+          <input type="text" id="ig-title" required placeholder="예: 평안히 가도록">
+        </label>
+        <div class="sermon-form-row">
+          <label>기간/날짜
+            <input type="text" id="ig-period" placeholder="예: 2026-07-12 ~ 07-18">
+          </label>
+          <label>본문 구절
+            <input type="text" id="ig-passage" placeholder="예: 출애굽기 18:13-23">
+          </label>
+        </div>
+        <label>시리즈명 (선택)
+          <input type="text" id="ig-series" placeholder="예: 모세 시리즈 14">
+        </label>
+        <label>포인트
+          <textarea id="ig-points" rows="6" placeholder="🕯️|말씀의 등불|본문 설명..."></textarea>
+        </label>
+        <p class="field-hint">한 줄에 하나씩, "아이콘|제목|내용" 형식으로 적어주세요.</p>
+        <label>키워드 (쉼표로 구분)
+          <input type="text" id="ig-keywords" placeholder="샬롬, 하일, 에메트">
+        </label>
+        <label>한 주 동안 실천하며
+          <textarea id="ig-practices" rows="3" placeholder="한 줄에 하나씩 적어주세요."></textarea>
+        </label>
+        <label>공동체 기도문
+          <textarea id="ig-prayer" rows="3"></textarea>
+        </label>
+        <div class="sermon-form-actions">
+          <button type="submit" class="btn btn-primary" id="ig-submit-btn">등록하기</button>
+          <button type="button" class="btn btn-ghost" id="ig-cancel-btn" hidden>수정 취소</button>
+        </div>
+        <p class="auth-error" id="ig-error" hidden></p>
+      </form>
+
+      <div class="admin-toolbar" style="margin-top:36px;">
+        <p style="font-weight:700;">등록된 설교 인포그래픽</p>
+      </div>
+      <div class="sermon-table-wrap">
+        <table class="sermon-table">
+          <thead><tr><th>기간</th><th>제목</th><th>관리</th></tr></thead>
+          <tbody id="ig-tbody"></tbody>
+        </table>
+      </div>
+      <p class="sermon-empty" id="ig-empty" hidden>등록된 글이 없습니다.</p>
+    </div>
+
+    <!-- 주간묵상집 -->
+    <div class="admin-tab-panel" id="panel-weekly">
+      <form id="form-weekly" class="sermon-form">
+        <input type="hidden" id="wk-id">
+        <label>제목
+          <input type="text" id="wk-title" required placeholder="예: 평안히 가도록">
+        </label>
+        <div class="sermon-form-row">
+          <label>기간/날짜
+            <input type="text" id="wk-period" placeholder="예: 2026-07-12 ~ 07-18">
+          </label>
+          <label>본문 구절
+            <input type="text" id="wk-passage" placeholder="예: 출애굽기 18:13-23">
+          </label>
+        </div>
+        <label>공동체 토론 질문
+          <textarea id="wk-discussion" rows="4" placeholder="한 줄에 하나씩 적어주세요."></textarea>
+        </label>
+        <label>일자별 묵상
+          <textarea id="wk-daily" rows="8" placeholder="2026-07-12|출18:13|묵상 내용...|실천 내용|기도 내용"></textarea>
+        </label>
+        <p class="field-hint">한 줄에 하루씩, "날짜|본문|묵상|실천|기도" 형식으로 적어주세요. (이 내용이 홈페이지 팝업의 "매일성경묵상"에도 자동으로 모여 보입니다)</p>
+        <div class="sermon-form-actions">
+          <button type="submit" class="btn btn-primary" id="wk-submit-btn">등록하기</button>
+          <button type="button" class="btn btn-ghost" id="wk-cancel-btn" hidden>수정 취소</button>
+        </div>
+        <p class="auth-error" id="wk-error" hidden></p>
+      </form>
+
+      <div class="admin-toolbar" style="margin-top:36px;">
+        <p style="font-weight:700;">등록된 주간묵상집</p>
+      </div>
+      <div class="sermon-table-wrap">
+        <table class="sermon-table">
+          <thead><tr><th>기간</th><th>제목</th><th>관리</th></tr></thead>
+          <tbody id="wk-tbody"></tbody>
+        </table>
+      </div>
+      <p class="sermon-empty" id="wk-empty" hidden>등록된 글이 없습니다.</p>
+    </div>
+
+    <!-- 소그룹나눔 관리 (성도들이 직접 작성 — 여기서는 부적절한 글 삭제만) -->
+    <div class="admin-tab-panel" id="panel-share">
+      <p style="color:var(--text-gray); font-size:14px; margin-bottom:16px;">소그룹나눔은 성도님들이 홈페이지 팝업 → 소그룹나눔에서 직접 작성합니다. 여기서는 부적절한 글만 삭제할 수 있습니다.</p>
+      <div class="sermon-table-wrap">
+        <table class="sermon-table">
+          <thead><tr><th>작성일</th><th>이름</th><th>내용</th><th>관리</th></tr></thead>
+          <tbody id="sh-tbody"></tbody>
+        </table>
+      </div>
+      <p class="sermon-empty" id="sh-empty" hidden>등록된 글이 없습니다.</p>
+    </div>
+  </div>
+</div>
+
+<div id="footerHost"></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="/supabase-config.js"></script>
+<script src="/member-auth.js"></script>
+<script src="/weekly-content-data.js"></script>
+<script src="/common.js"></script>
+<script>
+function esc(s) { return (s || '').toString().replace(/&/g,'&amp;').replace(/</g,'&lt;'); }
+function nl2list(s) { return (s||'').split('\n').map(x=>x.trim()).filter(Boolean); }
+
+// ---------- 탭 전환 ----------
+document.querySelectorAll('.admin-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.admin-tab-panel').forEach(p => p.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById('panel-' + tab.dataset.tab).classList.add('active');
+  });
+});
+
+// ---------- 설교 인포그래픽 ----------
+let __igList = [];
+
+function resetInfographicForm() {
+  document.getElementById('ig-id').value = '';
+  document.getElementById('form-infographic').reset();
+  document.getElementById('ig-submit-btn').textContent = '등록하기';
+  document.getElementById('ig-cancel-btn').hidden = true;
+}
+
+async function loadInfographicList() {
+  __igList = await fetchWeeklyContent('infographic');
+  const tbody = document.getElementById('ig-tbody');
+  const empty = document.getElementById('ig-empty');
+  if (__igList.length === 0) { tbody.innerHTML = ''; empty.hidden = false; return; }
+  empty.hidden = true;
+  tbody.innerHTML = __igList.map(item => `
+    <tr>
+      <td>${esc(item.period)}</td>
+      <td>${esc(item.title)}</td>
+      <td>
+        <button type="button" class="btn btn-ghost btn-sm" data-edit="${item.id}">수정</button>
+        <button type="button" class="btn btn-ghost btn-sm" data-delete="${item.id}">삭제</button>
+      </td>
+    </tr>`).join('');
+  tbody.querySelectorAll('[data-edit]').forEach(btn => btn.addEventListener('click', () => startEditInfographic(btn.dataset.edit)));
+  tbody.querySelectorAll('[data-delete]').forEach(btn => btn.addEventListener('click', () => removeInfographic(btn.dataset.delete)));
+}
+
+function startEditInfographic(id) {
+  const item = __igList.find(x => x.id === id);
+  if (!item) return;
+  const d = item.data || {};
+  document.getElementById('ig-id').value = item.id;
+  document.getElementById('ig-title').value = item.title || '';
+  document.getElementById('ig-period').value = item.period || '';
+  document.getElementById('ig-passage').value = d.passage || '';
+  document.getElementById('ig-series').value = d.series || '';
+  document.getElementById('ig-points').value = (d.points||[]).map(p => `${p.icon||''}|${p.title||''}|${p.body||''}`).join('\n');
+  document.getElementById('ig-keywords').value = (d.keywords||[]).join(', ');
+  document.getElementById('ig-practices').value = (d.practices||[]).join('\n');
+  document.getElementById('ig-prayer').value = d.prayer || '';
+  document.getElementById('ig-submit-btn').textContent = '수정 저장';
+  document.getElementById('ig-cancel-btn').hidden = false;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+async function removeInfographic(id) {
+  if (!confirm('이 글을 삭제할까요? 되돌릴 수 없습니다.')) return;
+  try { await deleteWeeklyContent(id); await loadInfographicList(); }
+  catch (err) { alert('삭제 중 오류가 발생했습니다: ' + err.message); }
+}
+
+document.getElementById('ig-cancel-btn').addEventListener('click', resetInfographicForm);
+document.getElementById('form-infographic').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const errorEl = document.getElementById('ig-error');
+  errorEl.hidden = true;
+  const id = document.getElementById('ig-id').value;
+  const payload = {
+    category: 'infographic',
+    title: document.getElementById('ig-title').value.trim(),
+    period: document.getElementById('ig-period').value.trim(),
+    data: {
+      passage: document.getElementById('ig-passage').value.trim(),
+      series: document.getElementById('ig-series').value.trim(),
+      points: nl2list(document.getElementById('ig-points').value).map(line => {
+        const [icon, title, body] = line.split('|');
+        return { icon:(icon||'').trim(), title:(title||'').trim(), body:(body||'').trim() };
+      }),
+      keywords: document.getElementById('ig-keywords').value.split(',').map(s=>s.trim()).filter(Boolean),
+      practices: nl2list(document.getElementById('ig-practices').value),
+      prayer: document.getElementById('ig-prayer').value.trim(),
+    },
+  };
+  try {
+    if (id) await updateWeeklyContent(id, payload); else await createWeeklyContent(payload);
+    resetInfographicForm();
+    await loadInfographicList();
+  } catch (err) {
+    errorEl.textContent = '저장 중 오류가 발생했습니다: ' + err.message;
+    errorEl.hidden = false;
+  }
+});
+
+// ---------- 주간묵상집 ----------
+let __wkList = [];
+
+function resetWeeklyForm() {
+  document.getElementById('wk-id').value = '';
+  document.getElementById('form-weekly').reset();
+  document.getElementById('wk-submit-btn').textContent = '등록하기';
+  document.getElementById('wk-cancel-btn').hidden = true;
+}
+
+async function loadWeeklyList() {
+  __wkList = await fetchWeeklyContent('weekly');
+  const tbody = document.getElementById('wk-tbody');
+  const empty = document.getElementById('wk-empty');
+  if (__wkList.length === 0) { tbody.innerHTML = ''; empty.hidden = false; return; }
+  empty.hidden = true;
+  tbody.innerHTML = __wkList.map(item => `
+    <tr>
+      <td>${esc(item.period)}</td>
+      <td>${esc(item.title)}</td>
+      <td>
+        <button type="button" class="btn btn-ghost btn-sm" data-edit="${item.id}">수정</button>
+        <button type="button" class="btn btn-ghost btn-sm" data-delete="${item.id}">삭제</button>
+      </td>
+    </tr>`).join('');
+  tbody.querySelectorAll('[data-edit]').forEach(btn => btn.addEventListener('click', () => startEditWeekly(btn.dataset.edit)));
+  tbody.querySelectorAll('[data-delete]').forEach(btn => btn.addEventListener('click', () => removeWeekly(btn.dataset.delete)));
+}
+
+function startEditWeekly(id) {
+  const item = __wkList.find(x => x.id === id);
+  if (!item) return;
+  const d = item.data || {};
+  document.getElementById('wk-id').value = item.id;
+  document.getElementById('wk-title').value = item.title || '';
+  document.getElementById('wk-period').value = item.period || '';
+  document.getElementById('wk-passage').value = d.passage || '';
+  document.getElementById('wk-discussion').value = (d.discussionQuestions||[]).join('\n');
+  document.getElementById('wk-daily').value = (d.dailyDevotions||[]).map(x => `${x.date||''}|${x.passage||''}|${x.reflection||''}|${x.practice||''}|${x.prayer||''}`).join('\n');
+  document.getElementById('wk-submit-btn').textContent = '수정 저장';
+  document.getElementById('wk-cancel-btn').hidden = false;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+async function removeWeekly(id) {
+  if (!confirm('이 글을 삭제할까요? 되돌릴 수 없습니다.')) return;
+  try { await deleteWeeklyContent(id); await loadWeeklyList(); }
+  catch (err) { alert('삭제 중 오류가 발생했습니다: ' + err.message); }
+}
+
+document.getElementById('wk-cancel-btn').addEventListener('click', resetWeeklyForm);
+document.getElementById('form-weekly').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const errorEl = document.getElementById('wk-error');
+  errorEl.hidden = true;
+  const id = document.getElementById('wk-id').value;
+  const payload = {
+    category: 'weekly',
+    title: document.getElementById('wk-title').value.trim(),
+    period: document.getElementById('wk-period').value.trim(),
+    data: {
+      passage: document.getElementById('wk-passage').value.trim(),
+      discussionQuestions: nl2list(document.getElementById('wk-discussion').value),
+      dailyDevotions: nl2list(document.getElementById('wk-daily').value).map(line => {
+        const [date, passage, reflection, practice, prayer] = line.split('|');
+        return { date:(date||'').trim(), passage:(passage||'').trim(), reflection:(reflection||'').trim(), practice:(practice||'').trim(), prayer:(prayer||'').trim() };
+      }),
+    },
+  };
+  try {
+    if (id) await updateWeeklyContent(id, payload); else await createWeeklyContent(payload);
+    resetWeeklyForm();
+    await loadWeeklyList();
+  } catch (err) {
+    errorEl.textContent = '저장 중 오류가 발생했습니다: ' + err.message;
+    errorEl.hidden = false;
+  }
+});
+
+// ---------- 소그룹나눔 (관리자: 조회 + 삭제만) ----------
+async function loadShareList() {
+  const list = await fetchWeeklyContent('share');
+  const tbody = document.getElementById('sh-tbody');
+  const empty = document.getElementById('sh-empty');
+  if (list.length === 0) { tbody.innerHTML = ''; empty.hidden = false; return; }
+  empty.hidden = true;
+  tbody.innerHTML = list.map(item => `
+    <tr>
+      <td>${esc(item.period)}</td>
+      <td>${esc(item.title)}</td>
+      <td style="max-width:320px;">${esc((item.data && item.data.content)||'')}</td>
+      <td><button type="button" class="btn btn-ghost btn-sm" data-delete="${item.id}">삭제</button></td>
+    </tr>`).join('');
+  tbody.querySelectorAll('[data-delete]').forEach(btn => btn.addEventListener('click', async () => {
+    if (!confirm('이 글을 삭제할까요? 되돌릴 수 없습니다.')) return;
+    try { await deleteWeeklyContent(btn.dataset.delete); await loadShareList(); }
+    catch (err) { alert('삭제 중 오류가 발생했습니다: ' + err.message); }
+  }));
+}
+
+// ---------- 초기화 ----------
+async function initAdminWeeklyWordPage() {
+  const profile = await getCurrentProfile();
+  if (!profile || !profile.is_admin) {
+    document.getElementById('adminGuard').hidden = false;
+    return;
+  }
+  document.getElementById('adminContent').hidden = false;
+  await Promise.all([loadInfographicList(), loadWeeklyList(), loadShareList()]);
+}
+
+document.addEventListener('DOMContentLoaded', () => setTimeout(initAdminWeeklyWordPage, 400));
+</script>
+</body>
+</html>
