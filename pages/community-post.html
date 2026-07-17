@@ -19,7 +19,11 @@
 </section>
 
 <div class="page-body" style="max-width:700px;">
-  <div class="community-post-detail">
+  <div id="readGuard" class="admin-guard" hidden>
+    <p>로그인한 성도님만 볼 수 있는 글입니다.</p>
+    <p style="margin-top:8px;"><a href="/pages/login.html">로그인</a> 또는 <a href="/pages/signup.html">회원가입</a> 후 다시 열어주세요.</p>
+  </div>
+  <div class="community-post-detail" id="postDetailWrap" hidden>
     <h2 id="postTitle" class="sermon-view-title"></h2>
     <p class="community-post-meta" id="postMeta"></p>
     <div class="sermon-view-body" id="postBody"></div>
@@ -43,14 +47,20 @@ const params = new URLSearchParams(location.search);
 const idParam = params.get('id') || '';
 
 (async function () {
+  const profile = await getCurrentProfile();
+  if (!profile) {
+    document.getElementById('readGuard').hidden = false;
+    return;
+  }
+  document.getElementById('postDetailWrap').hidden = false;
+
   try {
     const post = await fetchCommunityPostById(idParam);
     document.getElementById('postTitle').textContent = post.title || '';
     document.getElementById('postMeta').textContent = `${post.author_name} · ${(post.created_at || '').slice(0, 10)}`;
     document.getElementById('postBody').innerHTML = esc(post.body).replace(/\n/g, '<br>');
 
-    const profile = await getCurrentProfile();
-    if (profile && (profile.id === post.author_id || profile.is_admin)) {
+    if (profile.id === post.author_id || profile.is_admin) {
       const delBtn = document.getElementById('postDeleteBtn');
       delBtn.hidden = false;
       delBtn.addEventListener('click', async () => {
