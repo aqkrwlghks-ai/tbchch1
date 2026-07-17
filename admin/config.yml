@@ -47,6 +47,7 @@ collections:
               - { label: "분류", name: "category", widget: select, options: ["주일예배", "교회학교", "주중예배"], default: "주일예배" }
               - { label: "예배 이름", name: "name", widget: string }
               - { label: "시간", name: "time", widget: string }
+              - { label: "장소", name: "location", widget: string, default: "본당" }
 
           - label: "설교 영상"
             name: "sermon"

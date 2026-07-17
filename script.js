@@ -63,9 +63,9 @@ fetch('/content/site.json')
         <div class="worship-group ${g.cls}">
           <div class="worship-group-label">${g.key.slice(0, 2)}<br>${g.key.slice(2)}</div>
           <table class="worship-mini-table">
-            <thead><tr><th>예배</th><th>시간</th></tr></thead>
+            <thead><tr><th>예배</th><th>시간</th><th>장소</th></tr></thead>
             <tbody>
-              ${items.map(w => `<tr><td>${w.name}</td><td>${w.time}</td></tr>`).join('')}
+              ${items.map(w => `<tr><td>${w.name}</td><td>${w.time}</td><td>${w.location || '본당'}</td></tr>`).join('')}
             </tbody>
           </table>
         </div>`;
