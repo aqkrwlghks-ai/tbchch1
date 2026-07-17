@@ -690,11 +690,17 @@ section { padding: 88px 0; }
 #showcase-main .showcase-card--main {
   display: grid;
   grid-template-columns: 1.3fr 1fr;
+  align-items: stretch;
 }
-#showcase-main .showcase-card--main .showcase-thumb { padding-top: 0; height: 100%; }
+#showcase-main .showcase-card--main .showcase-thumb { padding-top: 0; position: relative; }
+#showcase-main .showcase-card--main .showcase-thumb::before { content: ""; display: block; padding-top: 56.25%; }
+#showcase-main .showcase-card--main .showcase-play { position: absolute; }
 #showcase-main .showcase-card--main .showcase-body { display: flex; flex-direction: column; justify-content: center; padding: 24px 28px; }
 #showcase-main .showcase-card--main h3 { font-size: 22px; }
 #showcase-main { margin-bottom: 20px; }
+@media (max-width: 700px) {
+  #showcase-main .showcase-card--main { grid-template-columns: 1fr; }
+}
 
 .showcase-row-wrap { position: relative; }
 .showcase-row {

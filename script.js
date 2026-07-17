@@ -206,11 +206,15 @@ async function loadShowcase() {
       : '<p class="showcase-empty">아직 등록된 주일설교가 없습니다.</p>';
 
     const rowItems = [wed[0], fri[0], praiseWed[0]].filter(Boolean);
-    const row = document.getElementById('showcase-row');
-    row.innerHTML = rowItems.map(item => showcaseCard(item, false)).join('');
-
-    document.getElementById('showcasePrev').addEventListener('click', () => row.scrollBy({ left: -300, behavior: 'smooth' }));
-    document.getElementById('showcaseNext').addEventListener('click', () => row.scrollBy({ left: 300, behavior: 'smooth' }));
+    const rowWrap = document.querySelector('.showcase-row-wrap');
+    if (rowItems.length === 0) {
+      rowWrap.hidden = true;
+    } else {
+      const row = document.getElementById('showcase-row');
+      row.innerHTML = rowItems.map(item => showcaseCard(item, false)).join('');
+      document.getElementById('showcasePrev').addEventListener('click', () => row.scrollBy({ left: -300, behavior: 'smooth' }));
+      document.getElementById('showcaseNext').addEventListener('click', () => row.scrollBy({ left: 300, behavior: 'smooth' }));
+    }
   } catch (err) {
     console.error('말씀과 찬양 로드 실패:', err);
   }
