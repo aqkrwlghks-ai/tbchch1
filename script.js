@@ -200,9 +200,11 @@ async function loadShowcase() {
       fetchSermons('praise-wed'),
     ]);
 
-    const mainItem = sunday[0];
-    document.getElementById('showcase-main').innerHTML = mainItem
-      ? showcaseCard(mainItem, true)
+    const mainItems = sunday.slice(0, 2);
+    const mainEl = document.getElementById('showcase-main');
+    mainEl.classList.toggle('showcase-main--single', mainItems.length === 1);
+    mainEl.innerHTML = mainItems.length
+      ? mainItems.map(item => showcaseCard(item, true)).join('')
       : '<p class="showcase-empty">아직 등록된 주일설교가 없습니다.</p>';
 
     const rowItems = [wed[0], fri[0], praiseWed[0]].filter(Boolean);
