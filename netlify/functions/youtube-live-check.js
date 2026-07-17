@@ -1,37 +1,35 @@
 // 빛나는교회 유튜브 채널이 지금 실시간 방송 중인지 확인한다.
-// 브라우저에서 유튜브 페이지를 직접 fetch하면 CORS로 막혀서 이 함수를 거친다.
-// API 키 없이, 채널의 /live 페이지 HTML에서 isLiveNow 여부를 직접 읽는다.
-const LIVE_PAGE_URL = "https://www.youtube.com/@TheBrighteningchurch/live";
+// YouTube Data API v3 search.list(eventType=live)를 사용 — 페이지 긁기 방식은
+// Netlify 서버 IP에서 유튜브가 다른(축소) 페이지를 줘서 신뢰할 수 없었음.
+// search.list는 호출당 100 유닛(기본 일일 할당량 10,000)을 쓰므로 캐시를 길게(15분) 둔다.
+const CHANNEL_ID = "UCFEmEydneJGmF5DN9UYeTmA";
+const API_KEY = process.env.YOUTUBE_API_KEY;
 
 exports.handler = async function () {
-  try {
-    const res = await fetch(LIVE_PAGE_URL, {
-      headers: {
-        "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0 Safari/537.36",
-        "Accept-Language": "ko-KR,ko;q=0.9,en;q=0.8",
-        "Cookie": "CONSENT=YES+1; SOCS=CAI",
-      },
-    });
-    const html = await res.text();
+  if (!API_KEY) {
+    return {
+      statusCode: 200,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ live: false, videoId: null, error: "YOUTUBE_API_KEY not set" }),
+    };
+  }
 
-    const isLive = /"isLiveNow":true/.test(html);
-    let videoId = null;
-    if (isLive) {
-      const m = html.match(/"videoId":"([\w-]{11})"/);
-      videoId = m ? m[1] : null;
-    }
+  try {
+    const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=${CHANNEL_ID}&eventType=live&type=video&key=${API_KEY}`;
+    const res = await fetch(url);
+    const data = await res.json();
+
+    const item = data.items && data.items[0];
+    const live = !!item;
+    const videoId = item ? item.id.videoId : null;
 
     return {
       statusCode: 200,
       headers: {
         "Content-Type": "application/json",
-        "Cache-Control": "public, max-age=60",
+        "Cache-Control": "public, max-age=900",
       },
-      body: JSON.stringify({
-        live: isLive && !!videoId,
-        videoId,
-        _debug: { status: res.status, len: html.length, hasConsent: /consent\.youtube\.com|Before you continue/i.test(html) },
-      }),
+      body: JSON.stringify({ live, videoId }),
     };
   } catch (err) {
     return {
