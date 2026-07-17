@@ -994,7 +994,6 @@ section { padding: 88px 0; }
 
 /* ---------- Responsive ---------- */
 @media (max-width: 860px) {
-  .quicklinks-grid { grid-template-columns: 1fr; }
   .about-grid { grid-template-columns: 1fr; }
   .footer-grid { grid-template-columns: 1fr; gap: 24px; }
 }
