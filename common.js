@@ -204,8 +204,29 @@ function injectPartials(callback) {
   });
 }
 
+// 스크롤 중 계속 따라다니다가 눌리면 맨 위로 부드럽게 이동하는 버튼 (전 페이지 공통)
+function initScrollTopButton() {
+  const btn = document.createElement('button');
+  btn.type = 'button';
+  btn.className = 'scroll-top-btn';
+  btn.setAttribute('aria-label', '맨 위로');
+  btn.innerHTML = `
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5"/><path d="M5 12l7-7 7 7"/></svg>
+    <span>맨위로</span>`;
+  document.body.appendChild(btn);
+
+  window.addEventListener('scroll', () => {
+    btn.classList.toggle('visible', window.scrollY > 400);
+  });
+
+  btn.addEventListener('click', () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   injectPartials(() => {
     loadSiteData();
   });
+  initScrollTopButton();
 });
