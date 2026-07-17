@@ -159,21 +159,15 @@
 
 <section class="sermon" id="sermon">
   <div class="container">
-    <p class="eyebrow">WEEKLY WORSHIP MEDIA</p>
-    <h2 class="section-title">설교 영상</h2>
-    <p class="sermon-desc">새 영상이 올라오면 자동으로 반영됩니다.</p>
-    <div class="video-wrap">
-      <iframe id="sermon-iframe"
-        src=""
-        title="빛나는교회 설교 영상"
-        frameborder="0"
-        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-        allowfullscreen
-        loading="lazy">
-      </iframe>
+    <div class="showcase-head">
+      <h2 class="section-title">말씀과 찬양</h2>
+      <a href="/pages/sermon-sunday.html" class="showcase-more">자세히 보기 →</a>
     </div>
-    <div class="sermon-cta">
-      <a id="sermon-channel-link" href="#" target="_blank" rel="noopener" class="btn btn-primary">유튜브 채널에서 더보기</a>
+    <div id="showcase-main"></div>
+    <div class="showcase-row-wrap">
+      <button type="button" class="showcase-nav showcase-nav--prev" id="showcasePrev" aria-label="이전">‹</button>
+      <div id="showcase-row" class="showcase-row"></div>
+      <button type="button" class="showcase-nav showcase-nav--next" id="showcaseNext" aria-label="다음">›</button>
     </div>
   </div>
 </section>
@@ -238,6 +232,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script src="/supabase-config.js"></script>
 <script src="/member-auth.js"></script>
+<script src="/sermons-data.js"></script>
 <script src="/common.js"></script>
 <script src="script.js"></script>
 </body>

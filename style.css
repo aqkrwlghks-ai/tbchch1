@@ -619,9 +619,8 @@ section { padding: 88px 0; }
 .worship-table td:first-child { font-weight: 700; color: var(--navy); }
 .worship-table td:first-child::before { content: "● "; color: var(--green); font-size: 10px; }
 
-/* Sermon */
+/* Sermon showcase (말씀과 찬양) */
 .sermon { background: #fff; }
-.sermon-desc { text-align: center; color: var(--text-gray); margin-bottom: 28px; }
 .video-wrap {
   position: relative;
   width: 100%;
@@ -631,7 +630,105 @@ section { padding: 88px 0; }
   box-shadow: 0 16px 40px rgba(15,40,70,0.15);
 }
 .video-wrap iframe { position: absolute; inset: 0; width: 100%; height: 100%; }
-.sermon-cta { text-align: center; margin-top: 28px; }
+.showcase-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+.sermon .showcase-head .section-title { text-align: left; margin-bottom: 0; }
+.showcase-more { color: var(--navy); font-weight: 700; font-size: 14px; white-space: nowrap; }
+.showcase-more:hover { text-decoration: underline; }
+
+.showcase-card {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+  border-radius: 16px;
+  overflow: hidden;
+  background: #fff;
+  box-shadow: 0 10px 30px rgba(15,40,70,0.08);
+  transition: transform 0.15s ease;
+}
+.showcase-card:hover { transform: translateY(-3px); }
+.showcase-thumb {
+  position: relative;
+  width: 100%;
+  padding-top: 56.25%;
+  background: var(--navy) center/cover no-repeat;
+}
+.showcase-play {
+  position: absolute;
+  right: 14px;
+  bottom: 14px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.9);
+  color: var(--navy);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+}
+.showcase-body { padding: 16px 18px 20px; }
+.showcase-badge {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  color: var(--navy);
+  background: var(--bg-warm);
+  padding: 3px 9px;
+  border-radius: 999px;
+  margin-bottom: 10px;
+}
+.showcase-body h3 { font-size: 17px; font-weight: 800; margin-bottom: 6px; }
+.showcase-body p { font-size: 13px; color: var(--text-gray); }
+.showcase-empty { color: var(--text-gray); padding: 40px 0; text-align: center; }
+
+#showcase-main .showcase-card--main {
+  display: grid;
+  grid-template-columns: 1.3fr 1fr;
+}
+#showcase-main .showcase-card--main .showcase-thumb { padding-top: 0; height: 100%; }
+#showcase-main .showcase-card--main .showcase-body { display: flex; flex-direction: column; justify-content: center; padding: 24px 28px; }
+#showcase-main .showcase-card--main h3 { font-size: 22px; }
+#showcase-main { margin-bottom: 20px; }
+
+.showcase-row-wrap { position: relative; }
+.showcase-row {
+  display: flex;
+  gap: 18px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  padding-bottom: 4px;
+}
+.showcase-row .showcase-card {
+  flex: 0 0 260px;
+  scroll-snap-align: start;
+}
+.showcase-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 2;
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  border: 1px solid var(--border-light);
+  background: #fff;
+  color: var(--navy);
+  font-size: 20px;
+  cursor: pointer;
+  box-shadow: 0 6px 16px rgba(15,40,70,0.12);
+}
+.showcase-nav--prev { left: -18px; }
+.showcase-nav--next { right: -18px; }
+@media (max-width: 860px) {
+  #showcase-main .showcase-card--main { grid-template-columns: 1fr; }
+  .showcase-nav { display: none; }
+}
 
 /* Gallery */
 .gallery { background: var(--bg-cool); }

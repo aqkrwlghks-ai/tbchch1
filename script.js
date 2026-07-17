@@ -66,11 +66,6 @@ fetch('/content/site.json')
         `${w1.name.replace('주일예배 ', '')} ${w1.time} · ${w2.name.replace('주일예배 ', '')} ${w2.time}`;
     }
 
-    // 설교 영상
-    const iframe = document.getElementById('sermon-iframe');
-    iframe.src = `https://www.youtube.com/embed/videoseries?list=${data.sermon.youtube_playlist_id}`;
-    document.getElementById('sermon-channel-link').href = data.sermon.youtube_channel_url;
-
     // 빠른링크: 유튜브 · 인스타그램
     document.getElementById('qcardYoutube').href = data.sermon.youtube_channel_url;
     const igCard = document.getElementById('qcardInstagram');
@@ -161,6 +156,66 @@ function showSundayPopup() {
   });
 }
 showSundayPopup();
+
+// 말씀과 찬양 캐러셀 (주일설교 메인 + 수요설교/금요설교/수요찬양)
+const SHOWCASE_LABELS = {
+  'sermon-sunday': '주일설교',
+  'sermon-wed': '수요설교',
+  'sermon-fri': '금요설교',
+  'praise-wed': '수요찬양',
+  'praise-fri': '금요찬양',
+};
+
+function showcaseEsc(s) { return (s || '').toString().replace(/&/g, '&amp;').replace(/</g, '&lt;'); }
+
+function showcaseThumb(url) {
+  if (!url) return null;
+  const m = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))([\w-]{6,})/);
+  return m ? `https://img.youtube.com/vi/${m[1]}/hqdefault.jpg` : null;
+}
+
+function showcaseCard(item, isMain) {
+  const thumb = showcaseThumb(item.video_url);
+  const label = SHOWCASE_LABELS[item.category] || '';
+  const meta = [item.scripture, item.speaker, (item.date || '').slice(0, 10)].filter(Boolean).join(' · ');
+  return `
+    <a href="/pages/sermon-view.html?id=${encodeURIComponent(item.id)}" class="showcase-card${isMain ? ' showcase-card--main' : ''}">
+      <div class="showcase-thumb"${thumb ? ` style="background-image:url('${thumb}')"` : ''}>
+        <span class="showcase-play">▶</span>
+      </div>
+      <div class="showcase-body">
+        <span class="showcase-badge">${label}</span>
+        <h3>${showcaseEsc(item.title)}</h3>
+        <p>${showcaseEsc(meta)}</p>
+      </div>
+    </a>`;
+}
+
+async function loadShowcase() {
+  try {
+    const [sunday, wed, fri, praiseWed] = await Promise.all([
+      fetchSermons('sermon-sunday'),
+      fetchSermons('sermon-wed'),
+      fetchSermons('sermon-fri'),
+      fetchSermons('praise-wed'),
+    ]);
+
+    const mainItem = sunday[0];
+    document.getElementById('showcase-main').innerHTML = mainItem
+      ? showcaseCard(mainItem, true)
+      : '<p class="showcase-empty">아직 등록된 주일설교가 없습니다.</p>';
+
+    const rowItems = [wed[0], fri[0], praiseWed[0]].filter(Boolean);
+    const row = document.getElementById('showcase-row');
+    row.innerHTML = rowItems.map(item => showcaseCard(item, false)).join('');
+
+    document.getElementById('showcasePrev').addEventListener('click', () => row.scrollBy({ left: -300, behavior: 'smooth' }));
+    document.getElementById('showcaseNext').addEventListener('click', () => row.scrollBy({ left: 300, behavior: 'smooth' }));
+  } catch (err) {
+    console.error('말씀과 찬양 로드 실패:', err);
+  }
+}
+loadShowcase();
 
 // 찬양 듣기 플로팅 플레이어 (고정곡 1곡, 히어로 버튼 클릭 시 재생)
 const PRAISE_YOUTUBE_ID = 'rlgvUfQAsAo';
