@@ -1049,6 +1049,18 @@ section { padding: 88px 0; }
   .qcard2-badge { font-size: 9px; padding: 3px 8px; }
   .qcard2 h3 { font-size: 13px; margin-bottom: 2px; }
   .qcard2 p { font-size: 10.5px; line-height: 1.25; }
+  #showcase-main { grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 16px; }
+  #showcase-main.showcase-main--single { grid-template-columns: 1fr; }
+  #showcase-main .showcase-card--main h3 { font-size: 13px; }
+  #showcase-main .showcase-card--main .showcase-body { padding: 10px 10px 12px; }
+  .showcase-row { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; overflow: visible; }
+  .showcase-row .showcase-card { flex: none; }
+  .showcase-nav { display: none; }
+  .showcase-body { padding: 10px 10px 12px; }
+  .showcase-badge { font-size: 9px; padding: 2px 7px; margin-bottom: 5px; }
+  .showcase-body h3 { font-size: 12.5px; margin-bottom: 3px; }
+  .showcase-body p { font-size: 10.5px; line-height: 1.3; }
+  .showcase-play { width: 26px; height: 26px; font-size: 11px; right: 8px; bottom: 8px; }
   .gallery-cat-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
   .gallery-cat-thumb { padding-top: 78%; }
   .gallery-cat-card > div:last-child { padding: 8px 10px 10px; }
