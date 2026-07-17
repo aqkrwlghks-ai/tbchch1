@@ -602,12 +602,11 @@ section { padding: 88px 0; }
   align-items: center;
 }
 .mission-media-title {
-  font-size: 13px;
-  font-weight: 700;
-  letter-spacing: 1px;
-  color: var(--green);
-  text-transform: uppercase;
-  margin-bottom: 10px;
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  color: var(--navy);
+  margin-bottom: 14px;
 }
 .mission-media {
   position: relative;
