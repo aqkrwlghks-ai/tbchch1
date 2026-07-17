@@ -2,7 +2,10 @@
 async function fetchSermons(category) {
   const sb = getSupabaseClient();
   if (!sb) return [];
-  let query = sb.from("sermons").select("*").order("date", { ascending: false });
+  let query = sb.from("sermons")
+    .select("*")
+    .order("date", { ascending: false, nullsFirst: false })
+    .order("sort_order", { ascending: true, nullsFirst: false });
   if (category) query = query.eq("category", category);
   const { data, error } = await query;
   if (error) throw error;
