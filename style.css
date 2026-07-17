@@ -699,15 +699,13 @@ section { padding: 88px 0; }
 
 #showcase-main {
   display: grid;
-  grid-template-columns: 1.7fr 1fr;
+  grid-template-columns: 1fr 1fr;
   gap: 24px;
   margin-bottom: 28px;
   align-items: start;
 }
-#showcase-main .showcase-card--main h3 { font-size: 18px; }
-#showcase-main .showcase-card--main .showcase-body { padding: 18px 20px 22px; }
-#showcase-main .showcase-card--main:first-child h3 { font-size: 23px; }
-#showcase-main .showcase-card--main:first-child .showcase-body { padding: 22px 26px 28px; }
+#showcase-main .showcase-card--main h3 { font-size: 20px; }
+#showcase-main .showcase-card--main .showcase-body { padding: 20px 22px 24px; }
 #showcase-main.showcase-main--single { grid-template-columns: 1fr; max-width: 460px; }
 @media (max-width: 700px) {
   #showcase-main { grid-template-columns: 1fr; }
