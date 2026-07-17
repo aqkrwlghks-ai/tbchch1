@@ -132,7 +132,7 @@ function initHeroSlides(images) {
 
   function restartTimer() {
     if (timer) clearInterval(timer);
-    timer = setInterval(() => goTo(current + 1), 15000);
+    timer = setInterval(() => goTo(current + 1), 10000);
   }
   restartTimer();
 
