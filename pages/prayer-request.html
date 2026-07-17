@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>중보기도요청 · 빛나는교회</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%230f3b64%22/><text x=%2250%22 y=%2268%22 font-size=%2255%22 text-anchor=%22middle%22 fill=%22white%22>%E2%9C%A6</text></svg>">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<div id="headerHost"></div>
+
+<section class="page-hero">
+  <span class="page-badge">COMMUNITY &amp; 양육</span>
+  <h1>🙏 중보기도요청</h1>
+  <p>성도님들이 나눈 기도 제목입니다. 함께 마음을 모아 기도해주세요.</p>
+  <div class="bar"></div>
+</section>
+
+<div class="page-body">
+  <div class="community-board">
+    <div class="community-board-header">
+      <div>
+        <h3 style="color:var(--navy);margin-bottom:6px;">기도 제목 나누기</h3>
+        <p style="color:var(--text-gray);font-size:14px;">회원가입 후 로그인하시면 기도요청을 작성하실 수 있습니다.</p>
+      </div>
+      <a href="/pages/prayer-request-write.html" class="btn btn-primary btn-sm">기도 요청하기</a>
+    </div>
+
+    <div class="community-table-wrap">
+      <table class="community-table">
+        <thead>
+          <tr><th>번호</th><th>제목</th><th>작성자</th><th>날짜</th></tr>
+        </thead>
+        <tbody id="communityTbody"></tbody>
+      </table>
+    </div>
+    <div id="communityPagination"></div>
+    <p class="community-empty" id="communityEmpty" hidden>아직 등록된 기도요청이 없습니다. 첫 기도 제목을 나눠주세요.</p>
+  </div>
+</div>
+
+<div id="footerHost"></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="/supabase-config.js"></script>
+<script src="/member-auth.js"></script>
+<script src="/common.js"></script>
+<script src="/community-data.js"></script>
+<script>
+const BOARD = "prayer-request";
+const COMMUNITY_PER_PAGE = 15;
+function esc(s) { return (s || '').toString().replace(/&/g,'&amp;').replace(/</g,'&lt;'); }
+
+let communityPosts = [];
+
+function renderCommunityRows(page) {
+  const tbody = document.getElementById('communityTbody');
+  const paginationEl = document.getElementById('communityPagination');
+  const start = (page - 1) * COMMUNITY_PER_PAGE;
+  const pagePosts = communityPosts.slice(start, start + COMMUNITY_PER_PAGE);
+  tbody.innerHTML = pagePosts.map((p, i) => `
+    <tr>
+      <td>${communityPosts.length - (start + i)}</td>
+      <td class="community-title"><a href="/pages/prayer-request-post.html?id=${encodeURIComponent(p.id)}">${esc(p.title)}</a></td>
+      <td>${esc(p.author_name)}</td>
+      <td>${(p.created_at || '').slice(0, 10)}</td>
+    </tr>`).join('');
+  renderPagination(paginationEl, communityPosts.length, COMMUNITY_PER_PAGE, page, renderCommunityRows);
+}
+
+async function loadCommunityList() {
+  const tbody = document.getElementById('communityTbody');
+  const emptyEl = document.getElementById('communityEmpty');
+  communityPosts = await fetchCommunityPosts(BOARD);
+  if (communityPosts.length === 0) {
+    tbody.innerHTML = '';
+    emptyEl.hidden = false;
+    return;
+  }
+  emptyEl.hidden = true;
+  renderCommunityRows(1);
+}
+
+document.addEventListener('DOMContentLoaded', () => setTimeout(loadCommunityList, 400));
+</script>
+</body>
+</html>
