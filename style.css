@@ -565,19 +565,32 @@ section { padding: 88px 0; }
   margin-bottom: 30px;
   letter-spacing: -0.5px;
 }
-.mission .section-title, .worship .section-title, .sermon .section-title,
+.worship .section-title, .sermon .section-title,
 .gallery .section-title, .notice .section-title, .offering .section-title, .visit .section-title {
   text-align: center;
 }
-.mission .eyebrow, .worship .eyebrow, .sermon .eyebrow,
+.worship .eyebrow, .sermon .eyebrow,
 .gallery .eyebrow, .notice .eyebrow, .offering .eyebrow, .visit .eyebrow {
   text-align: center;
 }
 
 /* Mission statement */
 .mission { background: #fff; }
-.mission-inner { text-align: center; }
+.mission-inner {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr;
+  gap: 48px;
+  align-items: center;
+}
+.mission-media img {
+  width: 100%;
+  border-radius: 18px;
+  box-shadow: 0 20px 50px rgba(15, 40, 70, 0.12);
+}
 .mission-text { font-size: 16px; line-height: 1.9; color: var(--text-gray); }
+@media (max-width: 860px) {
+  .mission-inner { grid-template-columns: 1fr; text-align: center; }
+}
 
 /* Worship table */
 .worship { background: var(--bg-cool); }
