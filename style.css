@@ -601,7 +601,7 @@ body {
 @media (max-width: 900px) {
   .quicklinks-grid { grid-template-columns: repeat(2, 1fr); }
 }
-@media (max-width: 520px) {
+@media (max-width: 340px) {
   .quicklinks-grid { grid-template-columns: 1fr; }
 }
 
@@ -652,7 +652,7 @@ section { padding: 88px 0; }
   display: flex; align-items: center; justify-content: center;
   color: rgba(255,255,255,0.6); font-size: 14px;
 }
-.mission-text { font-size: 16px; line-height: 1.9; color: var(--text-gray); }
+.mission-text { font-size: 16px; line-height: 1.9; color: var(--text-gray); word-break: keep-all; overflow-wrap: break-word; }
 @media (max-width: 860px) {
   .mission-inner { grid-template-columns: 1fr; text-align: center; }
 }
@@ -1037,13 +1037,19 @@ section { padding: 88px 0; }
   .worship-table th, .worship-table td { padding: 12px 14px; font-size: 13.5px; }
   .worship-groups { gap: 12px; }
   .worship-group-label { width: 56px; font-size: 15px; }
-  .worship-mini-table thead th { padding: 8px 8px; font-size: 11.5px; }
-  .worship-mini-table td { padding: 8px 8px; font-size: 13.5px; }
-  .qcard2 { padding: 14px; }
-  .qcard2-top { margin-bottom: 8px; }
-  .qcard2-icon { width: 32px; height: 32px; font-size: 15px; border-radius: 9px; }
-  .qcard2 h3 { font-size: 14.5px; margin-bottom: 3px; }
-  .qcard2 p { font-size: 11.5px; line-height: 1.3; }
+  .worship-mini-table thead th { padding: 8px 6px; font-size: 11px; }
+  .worship-mini-table td { padding: 8px 6px; font-size: 12.5px; }
+  .worship-mini-table th:nth-child(1), .worship-mini-table td:nth-child(1) {
+    width: 40%; white-space: normal; overflow: visible; text-overflow: clip; line-height: 1.25;
+  }
+  .worship-mini-table th:nth-child(2), .worship-mini-table td:nth-child(2) { width: 32%; }
+  .worship-mini-table th:nth-child(3), .worship-mini-table td:nth-child(3) { width: 28%; }
+  .qcard2 { padding: 12px; }
+  .qcard2-top { margin-bottom: 6px; }
+  .qcard2-icon { width: 28px; height: 28px; font-size: 13px; border-radius: 8px; }
+  .qcard2-badge { font-size: 9px; padding: 3px 8px; }
+  .qcard2 h3 { font-size: 13px; margin-bottom: 2px; }
+  .qcard2 p { font-size: 10.5px; line-height: 1.25; }
   .gallery-cat-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
   .gallery-cat-thumb { padding-top: 78%; }
   .gallery-cat-card > div:last-child { padding: 8px 10px 10px; }
