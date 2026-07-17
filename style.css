@@ -781,47 +781,50 @@ section { padding: 88px 0; }
 .gallery-cat-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 14px;
+  gap: 18px;
 }
 .gallery-cat-card {
-  display: flex;
-  gap: 14px;
+  display: block;
   background: #fff;
   border: 1px solid var(--border-light);
-  border-radius: 14px;
-  padding: 14px;
+  border-radius: 16px;
+  overflow: hidden;
   text-decoration: none;
   color: var(--text-dark);
   cursor: pointer;
   text-align: left;
   font-family: var(--font-body);
   width: 100%;
+  box-shadow: 0 10px 30px rgba(15,40,70,0.06);
+  transition: transform 0.15s ease;
 }
+.gallery-cat-card:hover { transform: translateY(-3px); }
 .gallery-cat-thumb {
-  width: 74px; height: 74px;
-  flex-shrink: 0;
-  border-radius: 10px;
+  width: 100%;
+  padding-top: 66%;
+  border-radius: 0;
   overflow: hidden;
   background: var(--bg-cool);
   position: relative;
 }
-.gallery-cat-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.gallery-cat-thumb img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
 .gallery-cat-count {
   position: absolute;
-  bottom: 3px; right: 3px;
+  bottom: 8px; right: 8px;
   background: rgba(0,0,0,0.6);
   color: #fff;
-  font-size: 10px;
-  padding: 1px 6px;
+  font-size: 11px;
+  padding: 3px 10px;
   border-radius: 10px;
 }
+.gallery-cat-card > div:last-child { padding: 14px 16px 16px; }
 .gallery-cat-label { color: var(--green); font-size: 11px; font-weight: 700; margin-bottom: 3px; }
-.gallery-cat-name { font-weight: 700; font-size: 15px; margin-bottom: 4px; }
+.gallery-cat-name { font-weight: 700; font-size: 16px; margin-bottom: 4px; }
 .gallery-cat-date { color: var(--text-gray); font-size: 12.5px; }
 .gallery-cat-thumb-empty {
-  width: 100%; height: 100%;
+  position: absolute; inset: 0;
   display: flex; align-items: center; justify-content: center;
-  color: var(--text-gray); font-size: 11px;
+  color: var(--text-gray); font-size: 12px;
 }
 
 /* 폴더 사진 전체보기 라이트박스 */
