@@ -99,8 +99,6 @@ fetch('/content/site.json')
     // 메인 배경 사진 슬라이드 (15초마다 자동 전환)
     initHeroSlides(data.hero.images);
 
-    // 매일 묵상 말씀 팝업
-    showDailyVerse(data.daily_verses);
   })
   .catch(err => console.error('site.json 로드 실패:', err));
 
@@ -154,21 +152,12 @@ function initHeroSlides(images) {
   }
 }
 
-function showDailyVerse(verses) {
-  if (!verses || verses.length === 0) return;
-
+// 주일 말씀 팝업 (설교 인포그래픽/주간묵상집/매일성경묵상/소그룹나눔 바로가기)
+function showSundayPopup() {
   const todayStr = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
   if (localStorage.getItem('verseModalDismissed') === todayStr) return;
 
-  // 오늘 날짜(연중 일수) 기준으로 말씀 목록을 순환하며 하나 선택
-  const start = new Date(new Date().getFullYear(), 0, 0);
-  const diff = new Date() - start;
-  const dayOfYear = Math.floor(diff / 86400000);
-  const verse = verses[dayOfYear % verses.length];
-
   const modal = document.getElementById('verseModal');
-  document.getElementById('verseModalText').textContent = `“${verse.text}”`;
-  document.getElementById('verseModalRef').textContent = verse.reference || '';
   modal.hidden = false;
 
   const close = () => {
@@ -184,6 +173,7 @@ function showDailyVerse(verses) {
     if (e.key === 'Escape') { close(); document.removeEventListener('keydown', escClose); }
   });
 }
+showSundayPopup();
 
 fetch('/content/notices.json')
   .then(res => res.json())
